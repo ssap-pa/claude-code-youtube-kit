@@ -25,7 +25,7 @@ def test_check_script_catches_demo_mistakes():
 def test_feedback_hook_logs_and_nudges(tmp_path):
     kit = tmp_path / 'kit'; shutil.copytree(KIT / 'hooks', kit / 'hooks'); (kit / 'memory').mkdir()
     hook = lambda p: subprocess.run([PY, str(kit / 'hooks' / 'capture_feedback.py')], input=json.dumps({'prompt': p}), capture_output=True, text=True, encoding='utf-8', env=ENV).stdout
-    assert '피드백 후보' in hook('앞으로 대본 마지막은 항상 질문으로 끝내')
+    assert '피드백 후보' in hook('앞으로 첫 장면은 결과부터, 방법은 숨겨')
     assert hook('좋아 진행해') == ''
     rows = [json.loads(x) for x in (kit / 'memory' / 'inbox.jsonl').read_text(encoding='utf-8').splitlines()]
     assert [r['status'] for r in rows] == ['new', 'note']
@@ -38,9 +38,9 @@ def test_session_start_injects_index():
 
 def test_memory_add_then_listed(tmp_path):
     kit = tmp_path / 'kit'; shutil.copytree(KIT / 'tools', kit / 'tools'); shutil.copytree(KIT / 'memory', kit / 'memory')
-    r = run(kit / 'tools' / 'memory.py', 'add', 'end-with-question', '--area', '대본', '--rule', '마지막 장면은 질문으로 끝낸다', '--why', '댓글을 부른다', cwd=kit)
+    r = run(kit / 'tools' / 'memory.py', 'add', 'hide-answer-opening', '--area', '대본', '--rule', '첫 장면은 결과부터, 방법은 숨겨 본론에서 공개한다', '--why', '답을 먼저 말하면 시청자가 나간다', cwd=kit)
     assert r.returncode == 0, r.stderr
-    assert '마지막 장면은 질문으로' in (kit / 'memory' / 'INDEX.md').read_text(encoding='utf-8')
+    assert '첫 장면은 결과부터' in (kit / 'memory' / 'INDEX.md').read_text(encoding='utf-8')
     assert run(kit / 'tools' / 'memory.py', 'check', cwd=kit).returncode == 0
 
 
