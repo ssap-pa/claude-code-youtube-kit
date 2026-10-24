@@ -1,0 +1,7 @@
+videos/*/renders/
+videos/*/cache/
+videos/*/qa/
+memory/inbox.jsonl
+.current-video
+__pycache__/
+.env

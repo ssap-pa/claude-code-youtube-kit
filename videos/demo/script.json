@@ -1,0 +1,39 @@
+{
+ "title": "데모 — 일부러 틀리게 쓴 대본(check_script로 검사해 보세요)",
+ "settings": {
+  "voice": {
+   "voice_id": "",
+   "model_id": "eleven_multilingual_v2",
+   "voice_settings": {
+    "stability": 0.5,
+    "similarity_boost": 0.8,
+    "style": 0,
+    "use_speaker_boost": true,
+    "speed": 1
+   }
+  },
+  "tones": {
+   "hype": {
+    "stability": 0.3,
+    "style": 0.55,
+    "speed": 1.12
+   }
+  },
+  "pron": {}
+ },
+ "scenes": [
+  {
+   "id": "v1-s1",
+   "tone": "hype",
+   "text": "요즘 ai로 유튜브 만드는 분들 정말 많죠."
+  },
+  {
+   "id": "v1-s2",
+   "text": "그런데 AI한테 매번 같은 말을 하고 있다면, 오늘 3가지만 기억하세요."
+  },
+  {
+   "id": "v1-s3",
+   "text": "피드백을 규칙으로 남기면, 다음부턴 ㅇㅇ만 쳐도 돼요."
+  }
+ ]
+}
