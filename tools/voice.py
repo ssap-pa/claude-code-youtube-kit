@@ -101,7 +101,7 @@ def list_voices():
     with urllib.request.urlopen(req, timeout=60) as r: vs = json.loads(r.read())['voices']
     if not vs: print('내 목소리가 없습니다 — 전문 복제 안내: docs/06-내-목소리-전문-복제.md'); return
     for v in vs: print(f"{v['voice_id']}  [{v.get('category')}]  {v['name']}")
-    print('→ script.json settings.voice.voice_id에 넣는다.')
+    print('→ script.json settings.voice.voice_id에 넣는다(모든 새 영상에 쓰려면 templates/video/script.json에도).')
 
 
 def main(argv):

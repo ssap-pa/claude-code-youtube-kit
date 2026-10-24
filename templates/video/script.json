@@ -1,0 +1,15 @@
+{
+ "title": "데모 — 피드백 한 번이면 AI가 기억한다",
+ "settings": {
+  "voice": {"voice_id": "", "model_id": "eleven_multilingual_v2",
+            "voice_settings": {"stability": 0.5, "similarity_boost": 0.8, "style": 0, "use_speaker_boost": true, "speed": 1}},
+  "tones": {"hype": {"stability": 0.25, "style": 0.7, "speed": 1.15}, "urgent": {"stability": 0.35, "style": 0.35, "speed": 1.08}},
+  "pron": {},
+  "approved": {}
+ },
+ "scenes": [
+  {"id": "v1-s1", "text": "피드백을 한 번 주면, AI가 그걸 기억해요."},
+  {"id": "v1-s2", "text": "그래서 다음 영상에선, 같은 말을 다시 할 필요가 없어요."},
+  {"id": "v1-s3", "text": "고칠 점은 규칙이 되고, 규칙은 검수가 다시 확인해요."}
+ ]
+}

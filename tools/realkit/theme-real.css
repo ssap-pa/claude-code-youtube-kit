@@ -1,0 +1,25 @@
+/* C. 원본 장면 흐림 배경 + 실사 휴대폰 — 패널은 어두운 유리, 알림은 iOS식 밝은 반투명 배너 */
+:root {
+  --page-bg: #0d0d0f;
+  --text: #ffffff; --text2: rgba(255,255,255,.72); --text3: rgba(255,255,255,.5);
+  --accent: #0a84ff; --accent-soft: rgba(10,132,255,.22); --accent-glow: rgba(10,132,255,.7);
+  --money: #30d158; --money-soft: rgba(48,209,88,.18);
+  --card: rgba(22,22,26,.56); --card-border: rgba(255,255,255,.16); --card-shadow: 0 30px 70px rgba(0,0,0,.45);
+  --card-blur: blur(28px) saturate(150%);
+  --bezel: #050505;
+  --phone-frame: 0 0 0 2px #151517, 0 0 0 6px #9a9ca1, 0 0 0 7px #5d5f63, inset 0 0 0 1px #2a2a2c;
+  --phone-shadow: 0 60px 120px rgba(0,0,0,.7), 0 0 0 9px rgba(255,255,255,.06);
+  --side-btn: linear-gradient(90deg, #6e7075, #b4b6ba);
+  --av-ring: #ffffff; --pill-bg: #0a84ff; --pill-ink: #ffffff; --pill-shadow: 0 12px 30px rgba(10,132,255,.4);
+  --noti-bg: rgba(242,242,247,.80); --noti-border: rgba(255,255,255,.55); --noti-text: #111113; --noti-text2: #3c3c43;
+  --noti-shadow: 0 24px 60px rgba(0,0,0,.35); --noti-blur: blur(30px) saturate(180%); --noti-ic-r: 20px;
+  --off-text: rgba(255,255,255,.6); --off-text2: rgba(255,255,255,.45); --off-line: rgba(255,255,255,.25); --off-fill: rgba(255,255,255,.08); --off-bright: .85;
+  --screen-bg: #000000; --b-line: #1f2024; --b-text: #ffffff; --b-text2: #8e8e93;
+  --tile-bg: radial-gradient(120% 90% at 50% 15%, #1d2a44 0%, #0b0d14 100%); --q-c: #ffffff; --lock-bg: #0a84ff;
+  --btn-dis: #1c1c1e; --btn-dis-t: #6c6c70;
+  --seg-bg: rgba(255,255,255,.12); --seg-t: #ffffff; --big-c: #30d158;
+  --line-c: #ffffff;
+}
+.bgimg { display: block; }
+.bgimg img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.bgimg::after { content: ''; position: absolute; inset: 0; background: radial-gradient(1200px 800px at 50% 50%, rgba(0,0,0,0) 0%, rgba(0,0,0,.45) 100%); }

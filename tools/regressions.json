@@ -1,5 +1,5 @@
 {
- "_설명": "재발 검사 목록 — 한 번 고친 표기 사고가 다시 나오지 않게 check_script.py가 음성을 만들기 전에 대본을 검사한다. 문제를 고치면 같은 작업 안에서 한 줄 추가한다(feedback-loop 스킬). kind: script(대본 글자 정규식). 일부러 쓴 장면 예외는 작업 폴더 qa/ok.json {\"장면 id\": \"사유\"}. 아래 항목은 키트 제작자가 실제 영상에서 겪고 고친 사고들이다.",
+ "_설명": "재발 검사 목록 — 한 번 고친 문제가 다음 영상에서 또 나오지 않게 qa.py가 매번 다시 확인한다. 문제를 고치면 같은 작업 안에서 한 줄 추가한다(feedback-loop 스킬). kind: script(대본 글자 정규식, unless가 있으면 같은 장면에 그 말이 없을 때만 걸림), code(도구 코드에 다시 들어오면 안 되는 것, files는 키트 루트 기준 또는 {video}), plan(배경음 계획 — qa.py가 id로 검사), audio·chain(qa.py의 해당 검사 안내), look(프레임 시트로 사람이 직접 확인). 영상별 예외는 영상 폴더 qa/ok.json {\"장면 id 또는 검사 id\": \"사유\"}. 아래 항목은 키트 제작자가 실제 영상에서 겪고 고친 사고들이다.",
  "items": [
   {
    "id": "lower-latin",
@@ -28,6 +28,103 @@
    "pattern": "AI ?비서",
    "symptom": "제품을 뭉뚱그린 이름으로 부름(시청자가 검색해 따라 할 수 없음)",
    "fix": "클로드 코드·제미나이처럼 공식 이름(규칙을 인용하는 장면은 ok.json)"
+  },
+  {
+   "id": "relatable-numbers-script",
+   "kind": "script",
+   "pattern": "(백|천|만|억|조|[0-9]{3,})[가-힣0-9,]*\\s?(미터|킬로미터|킬로|달러|원|톤|명|건|회)",
+   "unless": "치면|만큼|쯤|정도|아파트|축구장|하루|배|층|에펠탑|비교|인구|몇 번",
+   "symptom": "큰 수치를 그대로 말해 시청자가 크기를 못 느낌(예제 쇼츠 첫 문장 '팔백이십팔 미터짜리 건물' — 체감 규칙을 두고도 또 어김)",
+   "fix": "같은 장면에 체감 비교를 붙인다(아파트 몇 층·축구장 몇 개·하루 단위·익숙한 것 몇 배). 제품 자체 단위(크레딧 등)는 원화만, 일부러 그대로 쓰는 장면은 qa/ok.json"
+  },
+  {
+   "id": "bgm-stream-loop",
+   "kind": "code",
+   "files": [
+    "tools/bgm.py",
+    "tools/make_final.py"
+   ],
+   "forbid": "stream_loop",
+   "symptom": "곡 끝을 넘는 배경음 구간을 -stream_loop로 반복하면 한 바퀴 돈 뒤 길이 자르기·페이드가 안 먹어 곡이 계속 나와 다음 곡과 겹침",
+   "fix": "같은 곡을 이어 붙인 목록(concat)에서 자름(bgm.py)"
+  },
+  {
+   "id": "bgm-plan-gaps",
+   "kind": "plan",
+   "symptom": "배경음 구간 계획이 겹치거나 비면 두 곡이 같이 나오거나 음악이 끊김",
+   "fix": "구간은 앞 구간 끝에서 바로 시작, 영상 끝까지"
+  },
+  {
+   "id": "bgm-whole-song",
+   "kind": "plan",
+   "symptom": "곡이 끝나기 전에 자주 바꾸거나 같은 곡을 중간 지점에서 다시 꺼냄(시청자: '음악이 너무 자주 바뀜')",
+   "fix": "한 곡을 끝까지(남은 15초 이내까지) 틀고 다음 곡으로. bgm.json \"auto\"를 쓰면 자동으로 지켜짐"
+  },
+  {
+   "id": "bgm-overlap",
+   "kind": "audio",
+   "symptom": "두 곡이 동시에 나옴",
+   "fix": "qa.py 배경음 검사"
+  },
+  {
+   "id": "voice-transcript",
+   "kind": "audio",
+   "symptom": "음성이 대본과 다르게 읽힘(영어·고유명사·숫자)",
+   "fix": "qa.py 발음 검사 → 대본 표기를 고치거나 settings.pron에 소리 나는 대로 등록"
+  },
+  {
+   "id": "stale-chain",
+   "kind": "chain",
+   "symptom": "고친 대본·음성·클립이 합본에 안 들어간 채 올라감",
+   "fix": "qa.py 판 사슬 검사"
+  },
+  {
+   "id": "no-example-chip",
+   "kind": "look",
+   "symptom": "생성 장면에 '예시'·'재연' 칩",
+   "fix": "칩 없이, AI 합성 공개는 업로드 설정으로"
+  },
+  {
+   "id": "no-timestamps",
+   "kind": "look",
+   "symptom": "화면에 작업 시작·끝 시각·날짜(10/13 01:08 → …)",
+   "fix": "'15분·23시간'처럼 결과만"
+  },
+  {
+   "id": "no-empty-screen",
+   "kind": "look",
+   "symptom": "빈 화면·글자 카드만 있는 화면·설명용 단어 글자",
+   "fix": "아이콘·로고·실제 화면·애니메이션"
+  },
+  {
+   "id": "no-cover-overlap",
+   "kind": "look",
+   "symptom": "로고·말풍선·원문·출처 칩이 서로나 원본 자막·로고를 가림",
+   "fix": "위치 조정"
+  },
+  {
+   "id": "no-clipping",
+   "kind": "look",
+   "symptom": "창·카드가 화면 밖이나 얹힌 창 밖으로 잘림",
+   "fix": "1920×1080 사방 40px 여백 안에 온전히, 카드는 창 경계 안이나 빈 공간에"
+  },
+  {
+   "id": "relatable-numbers",
+   "kind": "look",
+   "symptom": "큰 수치(억 달러·조 원)를 그대로 말해 시청자가 체감 못 함",
+   "fix": "하루 단위·익숙한 것과 비교로, 환산 근거는 RESEARCH.md에"
+  },
+  {
+   "id": "ring-on-moving-source",
+   "kind": "look",
+   "symptom": "스크롤·이동하는 녹화 위에 고정된 강조 박스가 대상에서 빗나감",
+   "fix": "강조 순간엔 멈춘 녹화 구간을 쓰거나, 강조 박스를 녹화와 같은 이동 묶음 안에. 강조 시점 정지 화면으로 확인"
+  },
+  {
+   "id": "private-info",
+   "kind": "look",
+   "symptom": "이메일·전화·로그인 아이디·결제 번호 같은 비공개 개인 정보가 보임",
+   "fix": "realkit seq(boxes=...)로 흐림. 채널명·공개 댓글 작성자처럼 누구나 보는 정보는 그대로"
   }
  ]
 }

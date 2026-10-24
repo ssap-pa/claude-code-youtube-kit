@@ -1,0 +1,5 @@
+numpy>=1.24
+pillow>=10.0
+playwright>=1.40
+# 받아쓰기(발음 검수): ElevenLabs 키가 있으면 필요 없음. 키 없이 쓰려면 아래 주석을 풀어 설치
+# faster-whisper>=1.0

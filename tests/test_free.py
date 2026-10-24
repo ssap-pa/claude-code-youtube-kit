@@ -4,7 +4,8 @@ from pathlib import Path
 
 KIT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(KIT / 'tools'))
-import voice, memory  # noqa: E402
+import voice, memory, qa, make_final  # noqa: E402
+import numpy as np
 
 PY = sys.executable
 ENV = {**os.environ, 'PYTHONIOENCODING': 'utf-8'}
@@ -32,7 +33,7 @@ def test_feedback_hook_logs_and_nudges(tmp_path):
 
 def test_session_start_injects_index():
     out = run(KIT / 'hooks' / 'session_start.py').stdout
-    assert '학습 메모리 목록' in out and 'feedback-loop' in out and 'youtube-script' in out and 'youtube-video' not in out
+    assert '학습 메모리 목록' in out and 'feedback-loop' in out and 'youtube-script' in out and 'real-ui-design' in out and 'youtube-video' not in out
 
 
 def test_memory_add_then_listed(tmp_path):
@@ -61,6 +62,22 @@ def test_pron_maps_back_to_script_words():
 def test_discount_link_present():
     for f in ('README.md', 'docs/06-내-목소리-전문-복제.md'):
         t = (KIT / f).read_text(encoding='utf-8'); assert 'try.elevenlabs.io/surgaf77dx55' in t and '50% 할인' in t, f
+
+
+def test_sync_offset_detection():
+    rng = np.random.default_rng(1); sr = qa.SR
+    needle = rng.normal(size=int(1.5 * sr)) * np.hanning(int(1.5 * sr))
+    hay = np.zeros(10 * sr); start = int(4 * sr) + int(.12 * sr); hay[start:start + len(needle)] += needle; hay += .05 * rng.normal(size=len(hay))
+    off, r = qa.xcorr_offset(hay, needle, int(4 * sr), int(.5 * sr))
+    assert abs(off - .12) < .002 and r > .9   # 음성이 120ms 밀린 것을 찾아낸다
+
+
+def test_big_number_needs_comparison():
+    out = subprocess.run([PY, str(KIT / 'tools' / 'check_script.py'), str(KIT / 'videos' / 'demo')], capture_output=True, text=True, encoding='utf-8', env=ENV).stdout
+    assert '규칙 ' in out
+    it = next(i for i in json.loads((KIT / 'tools' / 'regressions.json').read_text(encoding='utf-8'))['items'] if i['id'] == 'relatable-numbers-script')
+    import re
+    assert re.search(it['pattern'], '팔백이십팔 미터짜리 건물') and not re.search(it['unless'], '팔백이십팔 미터짜리 건물')
 
 
 if __name__ == '__main__':

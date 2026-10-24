@@ -1,0 +1,37 @@
+/* 실사 UI 키트 — 움직임(영상용). realkit.js가 모든 애니메이션을 멈춘 채 currentTime을 프레임 시각으로 맞춘다.
+   쓰는 법: <div data-anim="drop@n1, out@c4+0.2">  → 이름[:길이[:fill]]@시각(신호 이름±초 또는 초). 목록은 realkit.js RK.presets.
+   규칙: 등장 키프레임은 0%가 '등장 전' 상태(fill both), 퇴장은 forwards, 순간 강조(bump·tap)는 fill none.
+   위치는 left/top으로 잡고, 움직임은 개별 속성 translate·scale·opacity만 바꿔 레이아웃 transform과 겹치지 않게 한다.
+   --o: 요소의 최종 불투명도(기본 1). */
+:root {
+  --spring: cubic-bezier(.24, 1.32, .42, 1);
+  --ease-out: cubic-bezier(.22, 1, .36, 1);
+  --ease-in: cubic-bezier(.55, 0, .8, .25);
+  --ease-inout: cubic-bezier(.65, 0, .35, 1);
+}
+@keyframes m-drop  { 0% { opacity: 0; translate: 0 -110px; scale: .97; } 45% { opacity: var(--o, 1); } 100% { opacity: var(--o, 1); translate: 0 0; scale: 1; } }
+@keyframes m-pop   { 0% { opacity: 0; scale: .55; } 40% { opacity: var(--o, 1); } 100% { opacity: var(--o, 1); scale: 1; } }
+@keyframes m-zin   { 0% { opacity: 0; scale: .9; } 100% { opacity: var(--o, 1); scale: 1; } }
+@keyframes m-rise  { 0% { opacity: 0; translate: 0 46px; } 100% { opacity: var(--o, 1); translate: 0 0; } }
+@keyframes m-inl   { 0% { opacity: 0; translate: -110px 0; } 100% { opacity: var(--o, 1); translate: 0 0; } }
+@keyframes m-inr   { 0% { opacity: 0; translate: 110px 0; } 100% { opacity: var(--o, 1); translate: 0 0; } }
+@keyframes m-fade  { 0% { opacity: 0; } 100% { opacity: var(--o, 1); } }
+@keyframes m-punch { 0% { scale: 1.06; } 100% { scale: 1; } }
+@keyframes m-out   { 0% { opacity: var(--o, 1); scale: 1; } 100% { opacity: 0; scale: .94; } }
+@keyframes m-outl  { 0% { opacity: var(--o, 1); translate: 0 0; } 100% { opacity: 0; translate: -160px 0; } }
+@keyframes m-outr  { 0% { opacity: var(--o, 1); translate: 0 0; } 100% { opacity: 0; translate: 160px 0; } }
+@keyframes m-fadeout { 0% { opacity: var(--o, 1); } 100% { opacity: 0; } }
+@keyframes m-bump  { 0% { scale: 1; } 35% { scale: 1.14; } 100% { scale: 1; } }
+@keyframes m-ring  { 0% { opacity: 0; scale: 1.3; } 100% { opacity: 1; scale: 1; } }
+@keyframes m-tap   { 0% { opacity: 0; scale: .3; } 12% { opacity: 1; } 100% { opacity: 0; scale: 1.9; } }
+@keyframes m-draw  { 0% { stroke-dashoffset: 1; } 100% { stroke-dashoffset: 0; } }
+@keyframes m-push  { 0% { scale: 1; } 100% { scale: 1.06; } }
+@keyframes m-prog  { 0% { width: var(--p0, 5%); } 100% { width: var(--p1, 70%); } }
+@keyframes m-fill  { 0% { width: 0; opacity: 1; } 85% { width: 100%; opacity: 1; } 100% { width: 100%; opacity: 0; } }
+@keyframes m-hl    { 0% { box-shadow: 0 0 0 0 rgba(10,132,255,0); } 100% { box-shadow: 0 0 0 4px var(--accent), 0 0 28px var(--accent-glow); } }
+@keyframes m-glow  { 0%, 100% { filter: drop-shadow(0 0 0 rgba(0,0,0,0)); } 40% { filter: drop-shadow(0 0 22px var(--accent-glow)); } }
+
+/* 선 그리기: <path pathLength="1" class="draw" data-anim="draw@t"> */
+.draw { stroke-dasharray: 1; stroke-dashoffset: 0; }
+/* 탭 물결·순간 효과는 평소 안 보이게(fill none) */
+.ripple { opacity: 0; }

@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><title>v1 · 데모</title>
+<!-- 키트 CSS·JS는 tools/realkit에 있다(영상 폴더 videos/<slug>/clips/v1/ 기준 네 단계 위). -->
+<link rel="stylesheet" href="../../../../tools/realkit/base.css">
+<link rel="stylesheet" href="../../../../tools/realkit/theme-real.css">
+<link rel="stylesheet" href="../../../../tools/realkit/motion.css">
+<script src="../../../../tools/realkit/ui-icons.js"></script>
+<script src="../../../../tools/realkit/realkit.js"></script>
+<script>window.RK_DEFAULT = {dur: 12, cues: {fb: 0.4, mem: 1.6, s2: 3.6, rule: 7.2, qa: 8.6}};</script>
+<style>
+  #n1 { left: 670px; top: 150px; }
+  #n2 { left: 670px; top: 310px; }
+  #k { left: 660px; top: 520px; width: 600px; }
+  #r { left: 1330px; top: 600px; width: 520px; }
+</style>
+</head>
+<body>
+  <!-- ① 뒤: 원본 흐림 배경(데모는 합성 영상, 실제 영상에선 그 장면의 원본) -->
+  <div class="bgimg"><img data-seq="src/bg" data-t0="0" data-anim="push:12@0"></div>
+
+  <!-- ③ 앞: 알림 배너 두 개 — 첫 단어 '피드백을'에 맞춰 내려온다 -->
+  <div class="card noti" id="n1" data-anim="drop@fb, out@s2-0.1">
+    <div class="ic" style="background:#0a84ff"><i data-ic="comment" data-c="#fff" data-f="1"></i></div>
+    <div class="tx"><div class="t1"><span class="tt">피드백</span><span class="tm">지금</span></div><div class="bd">로고는 심볼로</div></div>
+  </div>
+  <div class="card noti" id="n2" data-anim="drop@mem, out@s2-0.1">
+    <div class="ic" style="background:#30d158"><i data-ic="check" data-c="#fff" data-f="1"></i></div>
+    <div class="tx"><div class="t1"><span class="tt">memory</span><span class="tm">지금</span></div><div class="bd">rules/logo-symbol.md</div></div>
+  </div>
+
+  <!-- 숫자 카드: 같은 지적 횟수가 0으로 내려간다 -->
+  <div class="card kpi" id="k" data-anim="rise@s2+0.2">
+    <div class="gh"><span class="ic"><i data-ic="flag" data-c="#fff" data-f="1"></i></span>같은 지적</div>
+    <div class="row"><div class="big money"><span data-count="0" data-from="7" data-ct="s2+0.5" data-ct-end="s2+2" data-ease="inout"></span>번</div></div>
+  </div>
+  <div class="card kpi" id="r" data-anim="inr@rule">
+    <div class="gh"><span class="ic" style="background:#30d158"><i data-ic="check" data-c="#fff" data-f="1"></i></span>검수</div>
+    <div class="row"><div class="lb" data-anim="fade@qa">재발 0건</div></div>
+  </div>
+</body></html>

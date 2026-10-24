@@ -4,7 +4,7 @@
 
 | 방법 | 무엇에 | 인증 |
 |---|---|---|
-| **공식 API** (`tools/voice.py`) | 영상 음성 합성. **글자마다 시작·끝 시각**을 함께 받는다(전체 키트는 이 시각으로 화면·자막을 대사에 맞춘다) | API 키(환경변수 `ELEVENLABS_API_KEY`) |
+| **공식 API** (`tools/voice.py`, `tools/qa.py` 받아쓰기) | 영상 음성 합성. **글자마다 시작·끝 시각**을 함께 받아 화면 신호를 만든다(싱크의 출발점) | API 키(환경변수 `ELEVENLABS_API_KEY`) |
 | **공식 원격 MCP** (`.mcp.json`) | Claude와 대화하며 목소리 고르기·짧은 시험 음성·계정 확인 | 로그인(OAuth), 키를 설정 파일에 넣지 않음 |
 
 MCP로 만든 음성은 짧은 다운로드 링크로 오고 단어 시각이 없어서, 영상 제작 음성은 API(`voice.py`)로 만든다.
@@ -38,7 +38,7 @@ python tools/voice.py videos/<slug> v2       # 클립 하나
 - 대사·목소리·설정이 같으면 캐시를 쓴다(`cache/voices/`) — 고친 장면만 크레딧이 든다.
 - 장면에 `"tone": "hype"`(오프닝 첫 대사처럼 빠르고 감정 큰 톤)이나 `"urgent"`를 적으면 `settings.tones` 값으로 덮어쓴다.
 - 발음이 틀리면 대본은 그대로 두고 `settings.pron`에 소리 나는 대로 등록한다: `{"2월 2일부터": "이월 이일부터"}`. 화면·단어 시각은 원문 글자로 남는다.
-- 대본 표기 규칙(숫자 한글, 영어 대문자, 자모 금지)은 `memory/rules`와 `python tools/check_script.py` 재발 검사가 지킨다.
+- 대본 표기 규칙(숫자 한글, 영어 대문자, 자모 금지)은 `memory/rules`와 `qa.py` 재발 검사가 지킨다.
 
 ## 4. 공식 원격 MCP
 
@@ -61,4 +61,4 @@ claude mcp add --transport http elevenlabs https://api.elevenlabs.io/v1/mcp
 
 ## 5. 받아쓰기(발음 검수)
 
-받아쓰기로 음성이 대본과 다르게 읽힌 곳을 찾는 검수(ElevenLabs Speech to Text)는 전체 키트의 `qa.py`에 있다. 무료판에선 `python tools/listen.py videos/<slug>`로 이어 들어 본다.
+`qa.py`가 장면 음성을 ElevenLabs Speech to Text(`scribe_v1`)로 받아써 대본과 대조한다. 결과는 `qa/transcripts.json`에 캐시. 키 없이 하려면 `pip install faster-whisper`(CPU, 처음 한 번 모델을 받는다).

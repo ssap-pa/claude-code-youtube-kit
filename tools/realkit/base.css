@@ -1,0 +1,195 @@
+/* 실사 UI 키트 뼈대 — 색은 theme-real.css 변수로만 바꾼다. 글꼴은 하다 산스만(fonts/, git 제외). */
+@font-face { font-family: 'Hada'; font-weight: 900; src: url('fonts/HadaSans-Black.ttf'); }
+@font-face { font-family: 'Hada'; font-weight: 800; src: url('fonts/HadaSans-ExtraBold.ttf'); }
+@font-face { font-family: 'Hada'; font-weight: 700; src: url('fonts/HadaSans-Bold.ttf'); }
+@font-face { font-family: 'Hada'; font-weight: 600; src: url('fonts/HadaSans-SemiBold.ttf'); }
+@font-face { font-family: 'Hada'; font-weight: 500; src: url('fonts/HadaSans-Medium.ttf'); }
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { width: 1920px; height: 1080px; overflow: hidden; }
+body { font-family: 'Hada'; font-weight: 700; position: relative; background: var(--page-bg); color: var(--text); letter-spacing: -0.2px; }
+.abs { position: absolute; }
+[data-ic] { display: block; }
+[data-ic] svg { width: 100%; height: 100%; display: block; overflow: visible; }
+.bgimg { position: absolute; inset: 0; display: none; }
+
+/* ── 휴대폰 ───────────────────────────── */
+.phone {
+  position: absolute; width: 500px; height: 1008px; border-radius: 72px; padding: 12px;
+  background: var(--bezel); box-shadow: var(--phone-frame), var(--phone-shadow); z-index: 10;
+}
+.phone .btn-side { position: absolute; width: 5px; border-radius: 3px; background: var(--side-btn, transparent); }
+.screen { position: relative; width: 100%; height: 100%; border-radius: 60px; overflow: hidden; background: var(--screen-bg, #000); }
+.island { position: absolute; top: 16px; left: 50%; width: 128px; height: 38px; margin-left: -64px; background: #000; border-radius: 20px; z-index: 30; }
+.status { position: absolute; top: 0; left: 0; right: 0; height: 72px; display: flex; align-items: center; justify-content: space-between;
+          padding: 4px 34px 0 52px; z-index: 29; font-size: 28px; font-weight: 700; color: var(--status-c, #fff); }
+.status .r { display: flex; align-items: center; gap: 8px; }
+.status .r i:nth-child(1) { width: 30px; height: 20px; }
+.status .r i:nth-child(2) { width: 28px; height: 20px; }
+.status .r i:nth-child(3) { width: 42px; height: 20px; }
+
+/* 릴스 화면 (c0) */
+.reel { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 30%; }
+.shade-top { position: absolute; left: 0; right: 0; top: 0; height: 230px; background: linear-gradient(rgba(0,0,0,.55), rgba(0,0,0,0)); }
+.shade-bot { position: absolute; left: 0; right: 0; bottom: 0; height: 430px; background: linear-gradient(rgba(0,0,0,0), rgba(0,0,0,.72) 70%); }
+.reel-head { position: absolute; top: 78px; left: 30px; right: 26px; display: flex; justify-content: space-between; align-items: center;
+             font-size: 40px; font-weight: 800; color: #fff; }
+.reel-head i { width: 42px; height: 42px; }
+.reel-actions { position: absolute; right: 22px; bottom: 300px; display: flex; flex-direction: column; gap: 40px; align-items: center; }
+.reel-actions i { width: 52px; height: 52px; filter: drop-shadow(0 2px 6px rgba(0,0,0,.45)); }
+.reel-meta { position: absolute; left: 24px; right: 22px; bottom: 140px; color: #fff; }
+.reel-meta .row { display: flex; align-items: center; gap: 10px; white-space: nowrap; }
+.reel-meta .av { width: 54px; height: 54px; border-radius: 50%; object-fit: cover; border: 2px solid #fff; flex: none; }
+.reel-meta .h { font-size: 28px; font-weight: 800; letter-spacing: -0.6px; text-shadow: 0 1px 6px rgba(0,0,0,.4); }
+.reel-meta .follow { font-size: 28px; font-weight: 700; padding: 2px 12px 1px; border: 2px solid rgba(255,255,255,.9); border-radius: 12px; white-space: nowrap; flex: none; margin-left: 2px; }
+.ai-tag { display: inline-flex; align-items: center; gap: 8px; margin-top: 16px; padding: 5px 14px 4px 10px; border-radius: 10px;
+          font-size: 28px; font-weight: 700; color: #fff; background: rgba(255,255,255,.22); position: relative; }
+.ai-tag i { width: 26px; height: 26px; }
+.ai-tag.hl { box-shadow: 0 0 0 3px var(--accent), 0 0 24px var(--accent-glow); }
+.reel-prog { position: absolute; left: 0; right: 0; bottom: 104px; height: 4px; background: rgba(255,255,255,.28); }
+.reel-prog b { display: block; height: 100%; width: 34%; background: #fff; }
+.navbar { position: absolute; left: 0; right: 0; bottom: 0; height: 104px; background: #000; display: flex; justify-content: space-around;
+          align-items: center; padding: 0 18px 18px; }
+.navbar i { width: 44px; height: 44px; }
+.navbar .me { width: 44px; height: 44px; border-radius: 50%; background: #3a3b40; padding: 7px; }
+
+/* 출처 칩 */
+.src-chip { position: absolute; display: inline-flex; align-items: center; gap: 10px; font-size: 28px; font-weight: 600; white-space: nowrap; z-index: 40;
+            color: #fff; background: rgba(12,12,14,.66); padding: 6px 16px 5px 12px; border-radius: 999px; }
+.src-chip .yt { width: 30px; height: 21px; border-radius: 6px; background: #ff2a2a; position: relative; flex: none; }
+.src-chip .yt::after { content: ''; position: absolute; left: 12px; top: 5.5px; border-left: 9px solid #fff; border-top: 5px solid transparent; border-bottom: 5px solid transparent; }
+
+/* ── 카드 공통 ───────────────────────────── */
+.card { position: absolute; background: var(--card); border: 1px solid var(--card-border); box-shadow: var(--card-shadow);
+        -webkit-backdrop-filter: var(--card-blur, none); backdrop-filter: var(--card-blur, none); }
+
+/* AI 확대 콜아웃 (c0 왼쪽) */
+.callout { border-radius: 34px; padding: 34px 36px 38px; width: 560px; }
+.callout .who { display: flex; align-items: center; gap: 20px; }
+.callout .av { width: 104px; height: 104px; border-radius: 50%; object-fit: cover; flex: none; box-shadow: 0 0 0 4px var(--card), 0 0 0 7px var(--av-ring); }
+.callout .h { font-size: 36px; font-weight: 800; color: var(--text); line-height: 1.15; }
+.callout .sub { font-size: 28px; font-weight: 600; color: var(--text2); margin-top: 6px; }
+.callout .pill { display: inline-flex; align-items: center; gap: 14px; margin-top: 30px; padding: 16px 30px 13px 24px; border-radius: 20px;
+                 font-size: 54px; font-weight: 900; line-height: 1; color: var(--pill-ink); background: var(--pill-bg); box-shadow: var(--pill-shadow, none); }
+.callout .pill i { width: 50px; height: 50px; }
+.zoom { position: absolute; left: 0; top: 0; z-index: 5; pointer-events: none; }
+
+/* 알림 배너 */
+.noti { border-radius: 30px; width: 580px; height: 132px; padding: 0 28px 0 24px; display: flex; align-items: center; gap: 20px;
+        background: var(--noti-bg); border-color: var(--noti-border); box-shadow: var(--noti-shadow);
+        -webkit-backdrop-filter: var(--noti-blur, none); backdrop-filter: var(--noti-blur, none); z-index: 20; }
+.noti .ic { width: 80px; height: 80px; border-radius: var(--noti-ic-r, 50%); flex: none; display: flex; align-items: center; justify-content: center; }
+.noti .ic i { width: 42px; height: 42px; }
+.noti .tx { flex: 1; min-width: 0; }
+.noti .t1 { display: flex; justify-content: space-between; align-items: baseline; }
+.noti .tt { font-size: 32px; font-weight: 800; color: var(--noti-text); }
+.noti .tm { font-size: 28px; font-weight: 600; color: var(--noti-text2); }
+.noti .bd { font-size: 29px; font-weight: 600; color: var(--noti-text2); margin-top: 6px; white-space: nowrap; }
+.noti .bd b { color: var(--money); font-weight: 800; }
+.stack-hint { position: absolute; border-radius: 26px; background: var(--noti-bg); border: 1px solid var(--noti-border); z-index: 19;
+              -webkit-backdrop-filter: var(--noti-blur, none); backdrop-filter: var(--noti-blur, none); }
+
+/* ── c3: 프로필 카드 ───────────────────────────── */
+.prof { border-radius: 32px; width: 600px; height: 196px; padding: 0 26px; display: flex; align-items: center; gap: 22px; }
+.prof .av { width: 120px; height: 120px; border-radius: 50%; object-fit: cover; flex: none; filter: grayscale(1) brightness(var(--off-bright, .9)) contrast(.95); }
+.prof .col { flex: 1; min-width: 0; }
+.prof .nm { font-size: 36px; font-weight: 800; color: var(--off-text); line-height: 1.1; display: flex; align-items: center; gap: 10px; }
+.prof .ai { font-size: 28px; font-weight: 700; padding: 1px 10px 0; border-radius: 8px; color: var(--off-text2); border: 2px solid var(--off-line); }
+.prof .hd { font-size: 28px; font-weight: 600; color: var(--off-text2); margin-top: 6px; }
+.prof .rev { display: inline-flex; align-items: baseline; gap: 10px; margin-top: 12px; padding: 4px 14px 3px; border-radius: 10px; background: var(--off-fill); }
+.prof .rev span { font-size: 28px; font-weight: 700; color: var(--off-text2); }
+.prof .rev b { font-size: 34px; font-weight: 900; color: var(--off-text); }
+.prof .lk { width: 76px; height: 76px; border-radius: 50%; flex: none; display: flex; align-items: center; justify-content: center;
+            background: var(--accent-soft); position: relative; }
+.prof .lk i { width: 40px; height: 40px; }
+.tap { position: absolute; border-radius: 50%; pointer-events: none; z-index: 25; }
+
+/* c3: 링크로 열린 화면 (잠김) */
+.bbar { position: absolute; left: 0; right: 0; top: 70px; height: 86px; display: flex; align-items: center; justify-content: space-between;
+        padding: 0 26px; border-bottom: 1px solid var(--b-line); color: var(--b-text); z-index: 5; }
+.bbar i.x { width: 36px; height: 36px; }
+.bbar i.m { width: 36px; height: 36px; }
+.bbar .url { display: flex; align-items: center; gap: 10px; font-size: 30px; font-weight: 800; letter-spacing: 3px; color: var(--b-text2); }
+.bbar .url i { width: 26px; height: 26px; }
+.locked { position: absolute; left: 38px; right: 38px; top: 210px; height: 560px; border-radius: 40px; background: var(--tile-bg);
+          display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; }
+.locked .q { font-size: 360px; font-weight: 900; line-height: .82; color: var(--q-c); position: relative; z-index: 2; }
+.locked .badge { position: absolute; top: 28px; right: 28px; width: 84px; height: 84px; border-radius: 50%; background: var(--lock-bg);
+                 display: flex; align-items: center; justify-content: center; z-index: 3; }
+.locked .badge i { width: 44px; height: 44px; }
+.lockbtn { position: absolute; left: 38px; right: 38px; top: 800px; height: 92px; border-radius: 24px; background: var(--btn-dis);
+           display: flex; align-items: center; justify-content: center; gap: 12px; font-size: 32px; font-weight: 800; color: var(--btn-dis-t); }
+.lockbtn i { width: 34px; height: 34px; }
+
+/* c3: 매출 대시보드 */
+.dash { border-radius: 36px; width: 570px; padding: 34px 38px 30px; }
+.dash .hd { display: flex; align-items: center; justify-content: space-between; }
+.dash .ttl { display: flex; align-items: center; gap: 14px; font-size: 34px; font-weight: 800; color: var(--text); }
+.dash .ttl .ic { width: 58px; height: 58px; border-radius: 16px; background: var(--money); display: flex; align-items: center; justify-content: center; }
+.dash .ttl .ic i { width: 34px; height: 34px; }
+.dash .seg { font-size: 28px; font-weight: 700; color: var(--seg-t); background: var(--seg-bg); padding: 6px 16px 5px; border-radius: 12px; display: flex; align-items: center; gap: 6px; }
+.dash .seg i { width: 24px; height: 24px; }
+.dash .big { font-size: 112px; font-weight: 900; line-height: 1; letter-spacing: -3px; color: var(--big-c); margin-top: 26px; }
+.dash .meta { display: flex; align-items: center; gap: 14px; margin-top: 12px; font-size: 30px; font-weight: 700; color: var(--text2); }
+.dash .meta .up { display: inline-flex; align-items: center; gap: 6px; color: var(--money); background: var(--money-soft); padding: 3px 12px 2px; border-radius: 10px; font-size: 28px; }
+.dash .meta .up i { width: 26px; height: 26px; }
+.dash svg.chart { display: block; margin-top: 22px; }
+
+/* ── 영상 합성용 부품 (realkit) ── */
+.bgimg img { transform-origin: 50% 50%; }
+.dots { display: inline-block; width: 150px; height: 12px; vertical-align: middle;
+        background: radial-gradient(circle at 6px 6px, currentColor 5px, transparent 5.5px) 0 0 / 19px 12px repeat-x; }
+
+/* 영상 카드(동영상 사이트풍 — 상표 로고 없음) */
+.vcard { position: absolute; transform-origin: 0 0; }
+.vcard .thumb { position: relative; width: 100%; aspect-ratio: 16 / 9; border-radius: 26px; overflow: hidden; background: #000;
+                box-shadow: var(--card-shadow); border: 1px solid var(--card-border); }
+.vcard .thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.vcard .len { position: absolute; right: 16px; bottom: 22px; font-size: 28px; font-weight: 700; color: #fff; background: rgba(0,0,0,.78);
+              padding: 3px 12px 1px; border-radius: 9px; }
+.vcard .tag { position: absolute; left: 18px; top: 16px; font-size: 28px; font-weight: 700; color: #fff; background: rgba(12,12,14,.72);
+              padding: 4px 16px 2px; border-radius: 999px; }
+.vcard .bar { position: absolute; left: 0; right: 0; bottom: 0; height: 8px; background: rgba(255,255,255,.28); }
+.vcard .bar b { display: block; height: 100%; width: 0; background: #ff2a2a; }
+.vcard .vt { font-size: 40px; font-weight: 800; margin-top: 26px; line-height: 1.2; color: var(--text); letter-spacing: -0.4px; }
+.vcard .vm { display: flex; align-items: center; gap: 16px; margin-top: 18px; font-size: 32px; font-weight: 600; color: var(--text2); white-space: nowrap; }
+.vcard .vm .av { width: 64px; height: 64px; border-radius: 50%; object-fit: cover; flex: none; }
+.vcard .vm .views { font-size: 44px; font-weight: 900; color: var(--text); display: inline-block; }
+
+/* 창(브라우저·앱): .tb 제목줄(점 3개 + 가린 주소), 내용은 img 시퀀스 */
+.win { position: absolute; border-radius: 24px; overflow: hidden; background: #1b1b1f; border: 1px solid var(--card-border);
+       box-shadow: 0 40px 90px rgba(0,0,0,.55); }
+.win .tb { height: 60px; display: flex; align-items: center; gap: 11px; padding: 0 22px; background: #2a2a2f; color: var(--text3); }
+.win .tb .d { width: 16px; height: 16px; border-radius: 50%; flex: none; }
+.win .tb .url { flex: 1; margin: 0 90px 0 50px; height: 40px; border-radius: 11px; background: rgba(255,255,255,.08);
+                display: flex; align-items: center; justify-content: center; gap: 12px; }
+.win .tb .url i { width: 24px; height: 24px; }
+.win img { display: block; width: 100%; }
+.win.app { background: transparent; border-radius: 18px; }
+
+/* 영상 플레이어(가로 원본) */
+.player { position: absolute; border-radius: 26px; overflow: hidden; background: #000; border: 1px solid var(--card-border);
+          box-shadow: 0 40px 90px rgba(0,0,0,.55); }
+.player img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.player .bar { position: absolute; left: 0; right: 0; bottom: 0; height: 8px; background: rgba(255,255,255,.28); }
+.player .bar b { display: block; height: 100%; background: #ff2a2a; }
+
+/* 강조: 스포트라이트 링·탭 물결·로고 배지 */
+.ring { position: absolute; border-radius: 22px; border: 5px solid var(--accent); pointer-events: none; z-index: 30;
+        box-shadow: 0 0 0 7px var(--accent-soft), 0 0 46px var(--accent-glow); }
+.ripple { position: absolute; width: 132px; height: 132px; margin: -66px 0 0 -66px; border-radius: 50%; pointer-events: none; z-index: 40;
+          border: 5px solid var(--accent); background: var(--accent-soft); }
+.logo-badge { position: absolute; border-radius: 34px; background: #fff; display: flex; align-items: center; justify-content: center;
+              box-shadow: 0 26px 60px rgba(0,0,0,.5); z-index: 35; }
+.logo-badge img { width: 68%; height: 68%; object-fit: contain; }
+
+/* 숫자 카드(KPI): 작은 제목 + 큰 숫자 */
+.kpi { border-radius: 34px; padding: 30px 36px 32px; }
+.kpi .gh { display: flex; align-items: center; gap: 14px; font-size: 34px; font-weight: 800; color: var(--text); }
+.kpi .gh .ic { width: 58px; height: 58px; border-radius: 16px; background: var(--accent); display: flex; align-items: center; justify-content: center; }
+.kpi .gh .ic i { width: 34px; height: 34px; }
+.kpi .row { margin-top: 22px; }
+.kpi .lb { font-size: 30px; font-weight: 700; color: var(--text2); }
+.kpi .big { font-size: 112px; font-weight: 900; line-height: 1; letter-spacing: -3px; color: var(--text); margin-top: 6px; }
+.kpi .big.money { color: var(--money); }
+.kpi hr { border: 0; height: 1px; background: var(--card-border); margin-top: 26px; }

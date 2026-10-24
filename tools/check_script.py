@@ -16,6 +16,7 @@ def check(folder):
     for it in items:
         for s in scenes:
             found = list(dict.fromkeys(m.group(0) for m in re.finditer(it['pattern'], s['text'])))
+            if found and it.get('unless') and re.search(it['unless'], s['text']): found = []   # 같은 장면에 체감 비교 등이 있으면 통과
             if found and s['id'] not in ok and it['id'] not in ok and f"{it['id']}:{s['id']}" not in ok:
                 hits.append((s['id'], it, found))
     return scenes, items, hits

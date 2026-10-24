@@ -45,5 +45,8 @@ python tools/listen.py videos/<slug>         # 한 파일로 이어 듣기 + 단
 - 키 없이 흐름만 볼 땐 `--demo`(무음 + 가짜 단어 시각).
 - 이상하게 읽힌 날짜·숫자는 대본은 그대로 두고 `settings.pron`에 소리 나는 대로 등록한다: `{"이월 일일부터": "이월 이릴부터"}`. 낱말 자체가 어색하면 대본 표현을 바꿔 다시 합성하고 사용자에게 알린다.
 
-## 4. 그다음
-편집(대사 단어에 맞춰 화면이 움직이는 실사 UI), 합본·배경음, 음성·화면 싱크 검수, 세로 쇼츠는 전체 키트(https://ssapable.com/courses/youtube-automation-kit)에 있다. 사용자가 원하면 그렇게 한 줄로 알리고, 없는 도구를 지어내지 않는다.
+## 4. 그다음 — 장면·합본·검수
+- 화면: `real-ui-design` 스킬대로 장면 HTML을 짜고 빌더(`templates/video/build_v1.py`를 복사)에서 화면 신호를 **대사 단어 시각**(`V.T(장면, '단어')`)으로 만든다. 자세히는 `docs/04-편집과-싱크-검수.md`.
+- 합본·배경음: `python tools/make_final.py videos/<slug> final-v1`
+- 업로드 전 검수: `python tools/qa.py videos/<slug> final-v1` → ⚠ 0 + 직접 확인 [x] → `--gate`
+- 주제 하나로 리서치 → 소스 수집 → 클립 병렬 제작 → 오프닝 → 업로드 준비까지 한 번에 가는 제작 흐름, 3D 세로 설명 쇼츠, AI 장면 생성은 전체 키트(https://ssapable.com/courses/youtube-automation-kit)에 있다. 사용자가 원하면 한 줄로 알리고, 없는 도구를 지어내지 않는다.
