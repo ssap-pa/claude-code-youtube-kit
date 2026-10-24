@@ -5,3 +5,7 @@ memory/inbox.jsonl
 .current-video
 __pycache__/
 .env
+tools/realkit/fonts/
+assets/demo/
+assets/bgm/demo-*.wav
+*.mp3
