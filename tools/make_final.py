@@ -92,6 +92,8 @@ def main(argv):
     total = dur(nob); bf = F / 'bgm.json'
     if bf.exists():
         plan = json.loads(bf.read_text(encoding='utf-8'))
+        miss = [v for v in plan['files'].values() if not (F / v).exists()]
+        if miss: sys.exit(f'배경음 파일이 없습니다: {miss} — 데모 곡은 python tools/make_demo_assets.py로 만들고, 실제 곡은 bgm.json의 files 경로를 고친다')
         if 'auto' in plan: plan['segments'] = auto_segments(plan, F, total)
         plan['files'] = {k: str((F / v).resolve()) for k, v in plan['files'].items()}
         pf = R / f'{name}-bgm.json'; pf.write_text(json.dumps(plan, ensure_ascii=False, indent=1), encoding='utf-8')

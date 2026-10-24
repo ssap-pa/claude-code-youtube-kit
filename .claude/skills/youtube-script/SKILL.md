@@ -49,4 +49,4 @@ python tools/listen.py videos/<slug>         # 한 파일로 이어 듣기 + 단
 - 화면: `real-ui-design` 스킬대로 장면 HTML을 짜고 빌더(`templates/video/build_v1.py`를 복사)에서 화면 신호를 **대사 단어 시각**(`V.T(장면, '단어')`)으로 만든다. 자세히는 `docs/04-편집과-싱크-검수.md`.
 - 합본·배경음: `python tools/make_final.py videos/<slug> final-v1`
 - 업로드 전 검수: `python tools/qa.py videos/<slug> final-v1` → ⚠ 0 + 직접 확인 [x] → `--gate`
-- 주제 하나로 리서치 → 소스 수집 → 클립 병렬 제작 → 오프닝 → 업로드 준비까지 한 번에 가는 제작 흐름, 3D 세로 설명 쇼츠, AI 장면 생성은 전체 키트(https://ssapable.com/courses/youtube-automation-kit)에 있다. 사용자가 원하면 한 줄로 알리고, 없는 도구를 지어내지 않는다.
+- 주제 하나로 리서치 → 소스 수집 → 클립 병렬 제작 → 오프닝 → 업로드 준비까지 한 번에 가는 제작 흐름, AI 장면 생성은 전체 키트(https://ssapable.com/courses/youtube-automation-kit)에 있다. 사용자가 원하면 한 줄로 알리고, 없는 도구를 지어내지 않는다.

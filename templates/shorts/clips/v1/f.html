@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><title>f · 310m 더 올라가다</title>
+<link rel="stylesheet" href="../../../../tools/realkit/base.css">
+<link rel="stylesheet" href="../../../../tools/realkit/motion.css">
+<link rel="stylesheet" href="../../../../tools/realkit/vertical.css">
+<script>window.RK_DEFAULT = {dur: 7.3, cues: {grow: 1.0, up: 2.6, eiffel: 4.4}};</script>
+<script src="../../../../tools/realkit/vendor/three.min.js"></script>
+<script src="../../../../tools/realkit/realkit.js"></script>
+<script src="../../../../tools/realkit/captions.js"></script>
+</head>
+<body>
+<div id="stage"></div>
+<div class="kw accent" data-anim="pop@up">+310m<small data-anim="fade@eiffel">에펠탑 하나만큼</small></div>
+<div class="tag3d" id="tg" data-anim="pop@0.2">518m</div>
+<script src="../../../../tools/realkit/scene3d.js"></script>
+<script src="burj.js"></script>
+<script>
+S3D.start((T, S) => {
+  const c = RK.cues;
+  S.ground({ cityH: 120 });
+  BURJ.build(S);
+  const cut = new T.Plane(new T.Vector3(0, -1, 0), 518); S.renderer.clippingPlanes = [cut];   // 이 높이 위는 안 그린다 → 탑이 자라는 것처럼
+  const ring = new T.Mesh(new T.TorusGeometry(115, 2.6, 8, 64), new T.MeshBasicMaterial({ color: '#ffffff' }));
+  ring.rotation.x = Math.PI / 2; ring.position.y = 518; S.scene.add(ring);
+  S.tag(document.getElementById('tg'), [-170, 518, 0]);
+  return t => {
+    S.orbit(t, { from: -20, to: 10, dur: RK.dur, radius: 1350, radius2: 1550, height: 380, height2: 520, look: [0, 430, 0], look2: [0, 480, 0] });
+    cut.constant = 518 + 312 * S.ease.inout(S.prog(t, c.grow, c.up + .9 - c.grow));
+  };
+}, { sky: ['#8fb8de', '#f4e2c2'] });
+</script>
+</body></html>

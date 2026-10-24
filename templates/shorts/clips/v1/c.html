@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><title>c · 소용돌이가 건물을 흔든다</title>
+<link rel="stylesheet" href="../../../../tools/realkit/base.css">
+<link rel="stylesheet" href="../../../../tools/realkit/motion.css">
+<link rel="stylesheet" href="../../../../tools/realkit/vertical.css">
+<script>window.RK_DEFAULT = {dur: 7.4, cues: {vortex: 2.0, shake: 6.0}};</script>
+<script src="../../../../tools/realkit/vendor/three.min.js"></script>
+<script src="../../../../tools/realkit/realkit.js"></script>
+<script src="../../../../tools/realkit/captions.js"></script>
+</head>
+<body>
+<div id="stage"></div>
+<div class="tag3d" id="tg" data-anim="pop@vortex">소용돌이</div>
+<script src="../../../../tools/realkit/scene3d.js"></script>
+<script>
+/* 위에서 내려다본 단면: 바람은 화면 위 → 아래(+z)로, 건물 가운데 높이의 얇은 층만 그린다(연기 실험처럼).
+   건물 뒤(화면 아래쪽)에 좌우로 번갈아 생기는 소용돌이 줄 → 건물을 옆으로 흔든다. */
+S3D.start((T, S) => {
+  const c = RK.cues, R = 60, Hh = 420, Y = 230;
+  S.ground({ city: false, color: '#d8ccb4', bump: 0 });
+  const tower = new T.Group(); S.scene.add(tower);
+  const body = new T.Mesh(new T.CylinderGeometry(R, R, Hh, 32), S.mat('#c6d6e6', { metal: .12, rough: .4 }));
+  body.position.y = Hh / 2; body.castShadow = true; tower.add(body);
+  S.tag(document.getElementById('tg'), [175, Y, 520]);
+  const wind = S.trails(700, '#1572e8', .22, 6, 8, .85);
+  const f = .7, lam = 260;   // 소용돌이가 떨어져 나가는 박자와 간격(설명용 값)
+  return t => {
+    S.orbit(t, { from: 0, to: 6, dur: RK.dur, radius: 520, height: 1500, height2: 1420, look: [0, Y, 210] });
+    wind.place(([u, v, w], tt) => {
+      const z = -700 + ((u * 1900 + tt * 330) % 1900), y = Y + (v - .5) * 24; let x = (w - .5) * 520;
+      if (z < 0) { const d2 = x * x + z * z; if (d2 < 12 * R * R) x += Math.sign(x || 1) * R * R * 2.6 / Math.sqrt(d2 + 1); }   // 건물을 비켜 흐름
+      else {
+        const near = Math.exp(-Math.pow(x / 190, 2)), ph = 2 * Math.PI * (f * tt - z / lam), grow = Math.min(1, z / 220);
+        x += near * grow * 120 * Math.sin(ph) + near * grow * 35 * Math.sin(2 * ph + w * 9);
+      }
+      return [x, y, z];
+    }, t);
+    const a = S.ease.out(S.prog(t, c.shake - 1.4, 1.4));   // '흔듭니다'에 맞춰 흔들림이 커진다(설명용 과장)
+    tower.rotation.z = .07 * a * Math.sin(2 * Math.PI * f * t);
+  };
+}, { sky: ['#a9c4dc', '#efe4cf'], fov: 38 });
+</script>
+</body></html>

@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><title>e · 높이마다 다른 박자</title>
+<link rel="stylesheet" href="../../../../tools/realkit/base.css">
+<link rel="stylesheet" href="../../../../tools/realkit/motion.css">
+<link rel="stylesheet" href="../../../../tools/realkit/vertical.css">
+<script>window.RK_DEFAULT = {dur: 6.6, cues: {beat: 2.2, calm: 4.6}};</script>
+<script src="../../../../tools/realkit/vendor/three.min.js"></script>
+<script src="../../../../tools/realkit/realkit.js"></script>
+<script src="../../../../tools/realkit/captions.js"></script>
+</head>
+<body>
+<div id="stage"></div>
+<script src="../../../../tools/realkit/scene3d.js"></script>
+<script src="burj.js"></script>
+<script>
+S3D.start((T, S) => {
+  const c = RK.cues;
+  S.ground({ cityH: 90 });
+  const B = BURJ.build(S);
+  // 높이 셋, 박자 셋(설명용 값): 같은 바람이라도 높이마다 단면이 달라 소용돌이 박자가 어긋난다
+  const bands = [[110, .55, '#1e7cf2', 74], [300, .95, '#00b37a', 58], [480, 1.45, '#ff8a00', 42]].map(([y, f, col, r]) => ({ y, f, r, p: S.trails(420, col, .22, 5, 7, .9) }));
+  return t => {
+    S.orbit(t, { from: 62, to: 38, dur: RK.dur, radius: 1250, height: 520, height2: 600, look: [120, 320, 0] });
+    const show = S.prog(t, c.beat - .6, .8);
+    bands.forEach(b => {
+      b.p.material.opacity = .85 * show; b.p.visible = show > 0;
+      b.p.place(([u, v, w], tt) => {
+        const x = -800 + ((u * 1900 + tt * 380) % 1900), y = b.y + (v - .5) * 70; let z = (w - .5) * 380;
+        if (x < 0) { const d2 = x * x + z * z; if (d2 < 9 * b.r * b.r) z += Math.sign(z || 1) * b.r * b.r * 2 / Math.sqrt(d2 + 1); }
+        else z += Math.exp(-Math.pow(z / 220, 2)) * Math.min(1, x / 180) * 95 * Math.sin(2 * Math.PI * (b.f * tt - x / 240));
+        return [x, y, z];
+      }, t);
+    });
+    const calm = 1 - .8 * S.ease.out(S.prog(t, c.calm, 1.2));   // '흔들림이 한데 모이지 않습니다' → 흔들림이 잦아든다
+    B.group.rotation.x = .012 * calm * (Math.sin(2 * Math.PI * .55 * t) + Math.sin(2 * Math.PI * .95 * t + 1) + Math.sin(2 * Math.PI * 1.45 * t + 2)) / 3;
+  };
+}, { sky: ['#a6c3de', '#f0e3cb'] });
+</script>
+</body></html>

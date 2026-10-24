@@ -1,0 +1,21 @@
+/* 세로 쇼츠(1080x1920) — base.css 뒤에 링크한다. 빌더는 import 전에 os.environ['RK_FORMAT'] = 'vertical'.
+   안전 영역: 위 220px(채널명·검색), 아래 380px(제목·버튼)은 유튜브 쇼츠 화면이 덮으니 글자를 두지 않는다. */
+html, body { width: 1080px; height: 1920px; overflow: hidden; background: #0d0d0f; }
+#stage { position: absolute; inset: 0; }
+#stage canvas { display: block; width: 1080px; height: 1920px; }
+
+/* 말 자막: 2~3단어씩, 화면 가운데 조금 아래(안전 영역 안) */
+.cap { position: absolute; left: 60px; right: 60px; top: 1120px; text-align: center; z-index: 60;
+       font-family: 'Hada'; font-weight: 800; font-size: 64px; line-height: 1.2; color: #fff; letter-spacing: -1px;
+       text-shadow: 0 0 2px #000, 0 3px 0 #000, 0 0 18px rgba(0,0,0,.65); -webkit-text-stroke: 2px rgba(0,0,0,.55); paint-order: stroke fill; }
+.cap b { color: #ffd60a; }
+
+/* 핵심 숫자·낱말 카드: 화면 위쪽 1/3에 크게 */
+.kw { position: absolute; left: 0; right: 0; top: 330px; text-align: center; z-index: 55; font-family: 'Hada'; font-weight: 900;
+      font-size: 190px; line-height: 1; letter-spacing: -6px; color: #fff; text-shadow: 0 10px 40px rgba(0,0,0,.55), 0 0 3px #000; opacity: 0; }
+.kw small { display: block; font-size: 64px; font-weight: 800; letter-spacing: -1px; margin-top: 18px; color: #ffd60a; }
+.kw.accent { color: #ffd60a; }
+.kw.long { font-size: 128px; letter-spacing: -4px; }   /* 6자 넘는 카드(예: 아파트 280층) — 1080px 안에 한 줄로 */
+.tag3d { position: absolute; z-index: 50; transform: translate(-50%, -50%); font-family: 'Hada'; font-weight: 800; font-size: 46px; color: #fff;
+         padding: 10px 22px; border-radius: 18px; background: rgba(13,13,15,.62); border: 2px solid rgba(255,255,255,.35); white-space: nowrap; opacity: 0; }
+.tag3d.red { background: rgba(255,59,48,.85); border-color: rgba(255,255,255,.6); }

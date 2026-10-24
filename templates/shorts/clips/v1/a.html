@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><title>a · 828m 건물</title>
+<link rel="stylesheet" href="../../../../tools/realkit/base.css">
+<link rel="stylesheet" href="../../../../tools/realkit/motion.css">
+<link rel="stylesheet" href="../../../../tools/realkit/vertical.css">
+<script>window.RK_DEFAULT = {dur: 7, cues: {apt: .6, num: 2.0, s2: 4.4, name: 4.8}};</script>
+<script src="../../../../tools/realkit/vendor/three.min.js"></script>
+<script src="../../../../tools/realkit/realkit.js"></script>
+<script src="../../../../tools/realkit/captions.js"></script>
+</head>
+<body>
+<div id="stage"></div>
+<div class="kw long" data-anim="pop@apt-0.1, out@s2-0.15">아파트 280층<small data-anim="fade@num">828m</small></div>
+<div class="tag3d" id="tg" data-anim="pop@name">부르즈 할리파</div>
+<script src="../../../../tools/realkit/scene3d.js"></script>
+<script src="burj.js"></script>
+<script>
+S3D.start((T, S) => {
+  S.ground({ cityH: 140, cityMin: 760 });   // 낮은 카메라가 건물을 뚫고 지나가지 않게
+  BURJ.build(S);
+  S.tag(document.getElementById('tg'), [0, 860, 0]);
+  const c = RK.cues;
+  return t => {
+    if (t < c.s2) S.orbit(t, { from: 25, to: 5, dur: c.s2, radius: 520, radius2: 640, height: 30, height2: 120, look: [0, 520, 0], look2: [0, 600, 0] });   // 아래서 올려다보기
+    else S.orbit(t, { at: c.s2, from: -40, to: -15, dur: RK.dur - c.s2, radius: 1500, radius2: 1350, height: 900, height2: 760, look: [0, 380, 0] });          // 하늘에서 도시와 함께
+  };
+}, { sky: ['#9fc2e2', '#f1e3c8'] });
+</script>
+</body></html>

@@ -1,5 +1,6 @@
 """새 영상 폴더 만들기: templates/video → videos/<slug>, 그리고 현재 영상으로 지정(.current-video — 훅이 피드백을 이 영상에 붙인다).
 사용: python tools/new_video.py <slug>      (slug = 영문 소문자·숫자·하이픈, 예: ai-shopping-automation)
+      python tools/new_video.py --shorts <slug>   세로 설명 쇼츠(templates/shorts — 3D 장면·말 자막 예제)
       python tools/new_video.py --switch <slug>   이미 있는 영상으로 현재 영상만 바꾸기"""
 import json, re, shutil, sys
 from pathlib import Path

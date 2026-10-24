@@ -80,6 +80,19 @@ def test_big_number_needs_comparison():
     assert re.search(it['pattern'], '팔백이십팔 미터짜리 건물') and not re.search(it['unless'], '팔백이십팔 미터짜리 건물')
 
 
+def test_shorts_mode_included(tmp_path):
+    for f in ['tools/realkit/vertical.css', 'tools/realkit/captions.js', 'tools/realkit/scene3d.js', 'tools/realkit/vendor/three.min.js',
+              'templates/shorts/build_v1.py', 'templates/shorts/clips/v1/burj.js', '.claude/skills/shorts-explainer/SKILL.md']:
+        assert (KIT / f).exists(), f
+    out = subprocess.run([PY, str(KIT / 'tools' / 'check_script.py'), str(KIT / 'templates' / 'shorts')], capture_output=True, text=True, encoding='utf-8', env=ENV).stdout
+    assert '통과' in out, out   # 예제 쇼츠 대본은 표기·체감 수치 규칙을 지킨다
+    node = shutil.which('node')
+    if node:
+        for f in ['realkit.js', 'captions.js', 'scene3d.js']:
+            r = subprocess.run([node, '-e', "new Function(require('fs').readFileSync(process.argv[1],'utf8'))", str(KIT / 'tools' / 'realkit' / f)], capture_output=True, text=True)
+            assert r.returncode == 0, (f, r.stderr[-300:])
+
+
 if __name__ == '__main__':
     import inspect
     sys.stdout.reconfigure(encoding='utf-8'); fails = 0

@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><title>d · 계단처럼 깎아 낸 탑</title>
+<link rel="stylesheet" href="../../../../tools/realkit/base.css">
+<link rel="stylesheet" href="../../../../tools/realkit/motion.css">
+<link rel="stylesheet" href="../../../../tools/realkit/vertical.css">
+<script>window.RK_DEFAULT = {dur: 7.8, cues: {trick: 1.2, s7: 3.2, step: 5.0}};</script>
+<script src="../../../../tools/realkit/vendor/three.min.js"></script>
+<script src="../../../../tools/realkit/realkit.js"></script>
+<script src="../../../../tools/realkit/captions.js"></script>
+</head>
+<body>
+<div id="stage"></div>
+<div class="kw accent" data-anim="pop@trick, out@s7-0.2">바람 속이기</div>
+<script src="../../../../tools/realkit/scene3d.js"></script>
+<script src="burj.js"></script>
+<script>
+S3D.start((T, S) => {
+  const c = RK.cues;
+  S.ground({ cityH: 100 });
+  const B = BURJ.build(S);
+  const glow = S.mat('#ffd60a', { emissive: '#7a5a00', rough: .6 });
+  const base = B.tiers.map(g => g.children[0].material);
+  return t => {
+    if (t < c.s7) S.orbit(t, { from: 0, to: 50, dur: c.s7, radius: 380, height: 1150, height2: 1050, look: [0, 420, 0] });   // 위에서 내려다본 Y자 평면
+    else S.orbit(t, { at: c.s7, from: 140, to: 175, dur: RK.dur - c.s7, radius: 1050, height: 260, height2: 420, look: [0, 330, 0], look2: [0, 430, 0] });
+    const k = S.prog(t, c.step - .3, 2.2);   // '계단처럼'부터 아래 층에서 위로 한 칸씩 빛나며 올라간다
+    B.tiers.forEach((g, i) => { const on = k > 0 && Math.abs(k * B.tiers.length - i) < 2.2; g.children.forEach(m => m.material = on ? glow : base[i]); });
+  };
+}, { sky: ['#9fc2e2', '#f1e3c8'] });
+</script>
+</body></html>

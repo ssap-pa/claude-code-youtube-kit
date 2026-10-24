@@ -31,6 +31,11 @@ ffmpeg와 나머지 부품은 3단계에서 Claude가 설치해 줘요.
 
 12초짜리 실사 UI 데모 영상과 검수 보고서가 나와요. 알림 카드가 대사 단어에 맞춰 내려오는 게 보여요.
 
+**③-2 세로 설명 쇼츠 (3D)**
+> 예제 쇼츠 만들어 줘. new_video --shorts로 burj-demo 만들고, voice는 --demo로, build_v1 → make_final → qa까지 돌려 줘.
+
+「부르즈 할리파는 왜 계단처럼 깎였을까」 40초 세로 쇼츠가 나와요. 3D 건물·바람 장면에 말 자막과 숫자 카드가 대사에 맞춰 붙어요.
+
 **④ 내 목소리로**
 > ElevenLabs 연결하고 싶어. API 키 만드는 법부터 알려 줘.
 
@@ -52,5 +57,5 @@ ffmpeg와 나머지 부품은 3단계에서 Claude가 설치해 줘요.
 
 ## 더 나아가려면
 
-- 주제만 말하면 리서치부터 업로드 준비까지 한 번에 가는 제작 흐름, 3D 세로 설명 쇼츠: **[전체 키트 99,000원](https://ssapable.com/courses/youtube-automation-kit)**
+- 주제만 말하면 리서치부터 업로드 준비까지 한 번에 가는 제작 흐름, AI 실사 장면 생성(After 영상 수준): **[전체 키트 99,000원](https://ssapable.com/courses/youtube-automation-kit)**
 - 내 분야에 맞는 구조·스킬을 직접 설계하고, 내 키트로 만들어 팔기: **[강의](https://ssapable.com/courses/ai-agent)**
