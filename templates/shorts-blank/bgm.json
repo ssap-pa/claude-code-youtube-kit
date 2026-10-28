@@ -1,0 +1,6 @@
+{
+ "_설명": "배경음 계획. files 경로는 이 영상 폴더 기준. auto = 곡을 끝까지 틀고 다음 곡. 데모 곡은 tools/make_demo_assets.py가 만든 합성음 — 실제 영상에선 저작권 문제없는 음원으로 바꾸고 출처를 META.md에 적는다.",
+ "files": {"a": "../../assets/bgm/demo-a.wav", "b": "../../assets/bgm/demo-b.wav"},
+ "gain_db": -13, "fade": 0.5, "end_fade": 2,
+ "auto": ["a", "b"]
+}

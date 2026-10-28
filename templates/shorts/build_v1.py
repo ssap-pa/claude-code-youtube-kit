@@ -48,8 +48,8 @@ def next_version():
 
 if __name__ == '__main__':
     sys.stdout.reconfigure(encoding='utf-8')
-    if not (KIT / 'assets' / 'bgm' / 'demo-a.wav').exists():   # bgm.json 예제 곡(합성음) — 실제 영상에선 사용 허락된 음원으로
-        import subprocess; subprocess.run([sys.executable, str(KIT / 'tools' / 'make_demo_assets.py')], check=True)
+    if 'demo-' in (HERE / 'bgm.json').read_text(encoding='utf-8'):   # 데모 곡(합성음)이 없거나 예전 짧은 곡이면 만든다 — 실제 영상에선 처음 세팅에서 고른 곡으로
+        import subprocess; subprocess.run([sys.executable, str(KIT / 'tools' / 'make_demo_assets.py')], check=True, stdout=subprocess.DEVNULL)
     n = next_version(); out = HERE / 'renders' / f'{CLIP}-v{n}.mp4'
     info = rk.build(V, shots(), str(out), str(HERE / 'renders' / f'{CLIP}-v{n}-job'))
     rk.sheet(str(out), str(HERE / 'renders' / f'{CLIP}-v{n}-sheet.jpg'), 1.0)

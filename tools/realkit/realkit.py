@@ -65,6 +65,65 @@ def _norm(s):
     return _PUNCT.sub('', s)
 
 
+# ── 말 자막의 숫자·단위(Voice.captions) ──
+# 대본은 소리 나는 대로 쓴 숫자(음성용), 자막은 숫자. 사고: 낱말 일부도 바꿔 피사→피4, 공사→공4, 만든→1만든, 오면→5면.
+_KO_NUM = re.compile(r'(?:[영공일이삼사오육칠팔구십백천만억조]|하나|둘|셋|넷|다섯|여섯|일곱|여덟|아홉|열|스물|스무|서른|마흔|쉰|예순|일흔|여든|아흔|한|두|세|네)+')
+UNITS = sorted(('센티미터 밀리미터 킬로미터 제곱미터 킬로그램 미터 센티 밀리 킬로 그램 톤 리터 퍼센트 헥타르 '
+                '층 번 개월 개 명 시간 분 초 년 달 주 일 원 달러 배 곳 가지 살 대 도 장 권 채 척 마리 평 회 건 편 위').split(), key=len, reverse=True)
+_UNIT = '(?:' + '|'.join(UNITS) + ')'
+_PART = '(?:에서|에게|으로|까지|부터|만에|짜리|가량|정도|동안|이나|이에요|예요|입니다|이죠|은|는|이|가|을|를|의|에|도|와|과|로|만|나|쯤|째|씩|죠)'
+
+
+def _split_punct(w):
+    """'"팔백,' → ('"', '팔백', ',') — 앞뒤 문장부호를 떼어 낸 낱말."""
+    return re.fullmatch(r'(\W*)(.*?)(\W*)', w, re.S).groups()
+
+
+def is_unit(core):
+    """단위 낱말(+조사): 층·층을·센티미터·미터짜리·대와 …"""
+    return bool(core) and bool(re.fullmatch(f'{_UNIT}{_PART}*', core))
+
+
+def _shows_number(d):
+    return bool(re.search(r'\d(?:[.,]\d+)*(?:만|억|천|조)?%?$', d))
+
+
+def sub_word(w, sub):
+    """자막 숫자 바꾸기 — 낱말(앞뒤 문장부호 뗀 것) 전체가 key와 같을 때만 바꾼다.
+    두 글자 이상인 숫자 낱말(이백팔십·사십)이나 단위 낱말(센티미터)은 뒤에 조사(은·는·이·가·을·를·의·에·도·와·과·로·으로·만에 …)가
+    붙어도 바꾼다. 한 글자 key('사'·'만'·'오')는 낱말 전체가 같을 때만 — '사가'·'오는'·'만에'처럼 다른 뜻과 겹치기 때문.
+    붙여 쓴 숫자+단위('사십센티미터')는 숫자를 바꾸고, 단위도 sub에 있으면 같이 바꾼다('40cm')."""
+    pre, core, post = _split_punct(w)
+    if core in sub: return pre + sub[core] + post
+    if _KO_NUM.fullmatch(core): return w   # '삼십이'(32)를 '삼십'+'이'(조사)로 자르지 않는다
+    keys = sorted(sub, key=len, reverse=True)
+    for k in keys:
+        if len(k) < 2 or not core.startswith(k): continue
+        num, rest = bool(_KO_NUM.fullmatch(k)), core[len(k):]
+        if not (num or is_unit(k)): continue
+        if re.fullmatch(f'{_PART}+', rest): return pre + sub[k] + rest + post
+        if num and is_unit(rest):
+            u = next((u for u in keys if rest.startswith(u) and is_unit(u)), None)
+            return pre + sub[k] + (sub[u] + rest[len(u):] if u else rest) + post
+    return w
+
+
+def is_number(w, sub=None):
+    """자막에서 숫자로 보이는 낱말(바꾼 뒤 숫자로 끝나거나, 소리 나는 대로 쓴 숫자 낱말)."""
+    d = sub_word(w, sub or {})
+    return _shows_number(d) or bool(_KO_NUM.fullmatch(_split_punct(w)[1]))
+
+
+def cap_text(raw_words, sub):
+    """자막 한 묶음 글자: 낱말마다 sub_word, 숫자 바로 뒤 단위는 띄우지 않고 붙인다('19층', '1만대와')."""
+    out, prev_num = '', False
+    for r in raw_words:
+        d = sub_word(r, sub)
+        out += d if (out and prev_num and is_unit(_split_punct(r)[1])) else (' ' if out else '') + d
+        prev_num = _shows_number(d)
+    return out
+
+
 class Voice:
     """voices.json(tools/voice.py 결과: id·wav·duration·words) → 장면별 시작·길이와 단어 시각."""
 
@@ -108,18 +167,18 @@ class Voice:
     def captions(self, sids, base=None, words=3, chars=11, hl=(), lead=.05, sub=None):
         """말 자막 묶음(captions.js용): 단어 시각에서 2~3단어씩 → [{t0, t1, text, hl}] (base 장면 시작 기준 초).
         문장부호(, . ? !)에서 끊고, 한 묶음이 chars자를 넘으면 먼저 끊는다. 묶음은 다음 묶음 시작까지 보인다(깜빡임 없음).
-        sub = {대본 글자: 화면 글자} — 대본엔 한글로 쓴 숫자를 자막에선 숫자로(예: {'팔백이십팔': '828'})."""
+        sub = {대본 글자: 화면 글자} — 대본엔 한글로 쓴 숫자를 자막에선 숫자로(예: {'팔백이십팔': '828', '센티미터': 'cm'}).
+          낱말 전체가 key와 같을 때만 바뀐다(sub_word). 숫자 뒤 단위는 붙여 쓴다('19 층' → '19층', '40 센티미터' → '40cm')."""
         sub = sub or {}
-        disp = lambda w: next((w.replace(k, v) for k, v in sub.items() if k in w), w)
         base = base or sids[0]; out = []
         for sid in sids:
             off = self.start(sid) - self.start(base); cur = []
             ws = self.by[sid]['words']
             for i, w in enumerate(ws):
                 cur.append(w)
-                text = ' '.join(disp(x['text']) for x in cur)
+                text = cap_text([x['text'] for x in cur], sub)
                 nxt = ws[i + 1]['text'] if i + 1 < len(ws) else ''
-                unit = re.match(r'(층|미터|킬로|번|개|명|시간|분|초|년|달|원|달러|퍼센트|배|곳|가지|살)', nxt)   # 숫자와 단위는 한 묶음(사고: '280 / 층 쌓은'으로 끊김)
+                unit = is_number(w['text'], sub) and is_unit(_split_punct(nxt)[1])   # 숫자와 단위는 한 묶음(사고: '280 / 층 쌓은', '1만 / 대와'로 끊김)
                 if not unit and (len(cur) >= words or len(text.replace(' ', '')) >= chars or re.search(r'[,.?!…]$', w['text'])) or i == len(ws) - 1:
                     out.append({'t0': round(off + cur[0]['start'] - lead, 3), 't1': round(off + w['end'] + .25, 3),
                                 'text': re.sub(r'[,.]$', '', text), 'hl': [h for h in hl if h in text]})

@@ -22,7 +22,7 @@ MCP로 만든 음성은 짧은 다운로드 링크로 오고 단어 시각이 �
 `script.json`의 `settings.voice.voice_id`에 넣는다.
 - 기본 목소리: ElevenLabs **Voices** 화면에서 목소리 → 메뉴 → Copy voice ID. 한국어는 모델 `eleven_multilingual_v2`.
 - **내 목소리(추천)**: 채널을 계속할 거라면 처음부터 내 목소리로 가는 게 낫다. 전문 복제(PVC)는 감정·억양까지 살리고, 한 번 만들어 두면 그다음부터는 녹음 없이 대본만 쓰면 된다. 녹음·본인 확인·키트 연결까지 전 과정은 **[docs/06-내-목소리-전문-복제.md](06-내-목소리-전문-복제.md)**에 있다. 가입은 [첫 달 50% 할인 링크](https://try.elevenlabs.io/surgaf77dx55)에서.
-- 만든 목소리의 ID 찾기: `python tools/voice.py --voices`
+- 목소리 ID 찾기: `python tools/voice.py --voices` — 내 목소리(복제)와 기본 제공 목소리(premade)가 함께 나온다. 목록 조회는 크레딧이 들지 않는다. `voice_id`가 비어 있으면 `voice.py`는 합성하지 않고 멈춘다(`--demo` 제외).
 
 ```json
 "voice": {"voice_id": "여기에", "model_id": "eleven_multilingual_v2",

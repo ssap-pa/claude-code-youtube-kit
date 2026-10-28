@@ -1,11 +1,12 @@
 """대본(script.json) → 장면마다 음성 wav + 단어 시각(voices.json). 화면 신호는 이 단어 시각으로 만든다(음성·화면 싱크의 출발점).
 
 사용: python tools/voice.py videos/<slug> [op v1 …] [--demo] [--force]
-      python tools/voice.py --voices      내 계정 목소리와 voice_id(전문 복제한 내 목소리 찾기 — docs/06)
+      python tools/voice.py --voices      고를 수 있는 목소리와 voice_id — 내 목소리(복제) + ElevenLabs 기본 제공 목소리(premade). 목록 조회는 무료
   - 클립 = 장면 id의 '-' 앞부분(op, v1, v2 …). 클립을 안 적으면 대본의 모든 클립.
   - 결과: videos/<slug>/renders/voice-<clip>/voices.json  [{id, wav, duration, words:[{text,start,end}], hash}]
   - 캐시: videos/<slug>/cache/voices/<hash>.wav|json — 대사·목소리·설정이 같으면 다시 합성하지 않는다(크레딧 절약).
   - --demo: API 키 없이 무음 wav + 글자 수 비례 가짜 단어 시각으로 만든다(설치·파이프라인 시험용, 업로드용 아님).
+  - voice_id가 비어 있으면 --demo가 아닌 한 합성하지 않고 멈춘다(고를 목록과 넣는 법을 보여 줌). 조용히 데모 음성으로 넘어가지 않는다.
 
 대본 설정(script.json "settings")
   voice: {"voice_id": "...", "model_id": "eleven_multilingual_v2", "voice_settings": {"stability": .5, "similarity_boost": .8, "style": 0, "use_speaker_boost": true, "speed": 1}}
@@ -13,7 +14,7 @@
   pron:  {"2월 2일부터": "이월 이일부터"}   ← 합성에만 쓰는 소리 나는 대로 표기. 화면·대본·단어 시각 글자는 원문 그대로 남는다.
 키: 환경변수 ELEVENLABS_API_KEY (파일에 적지 않는다).
 """
-import base64, hashlib, json, os, re, subprocess, sys, urllib.request, wave
+import base64, hashlib, json, os, re, subprocess, sys, urllib.error, urllib.request, wave
 from pathlib import Path
 
 API = 'https://api.elevenlabs.io/v1/text-to-speech/{voice}/with-timestamps?output_format=mp3_44100_192'
@@ -93,15 +94,57 @@ def demo(say, wav):
     return words
 
 
+HOW_TO_SET = '''목소리 넣는 법(하나만 하면 된다):
+  · 앞으로 만들 모든 영상: {all_videos}
+  · 이미 만든 이 영상: videos/<slug>/script.json의 settings.voice.voice_id에 같은 값을 넣는다
+  · 내 목소리로 만들고 싶으면: docs/06-내-목소리-전문-복제.md (한 번 녹음해 두면 영상마다 녹음할 일이 없다)
+  · 지금은 흐름만 시험할 거면: --demo (무음 음성, 업로드용 아님)'''.format(all_videos=(
+    'python tools/setup.py set voice.voice_id=<voice_id>   (설정 파일이 없으면 먼저 python tools/setup.py init)'
+    if (Path(__file__).resolve().parent / 'setup.py').exists() else 'templates/video·templates/shorts-blank의 script.json에도 같은 값을 넣는다'))
+
+
+def fetch_voices(key):
+    """(내 목소리, 기본 제공 목소리) — 목록 조회는 크레딧이 들지 않는다. 키는 요청 머리글에만 쓰고 출력하지 않는다."""
+    def get(url):
+        with urllib.request.urlopen(urllib.request.Request(url, headers={'xi-api-key': key}), timeout=60) as r: return json.loads(r.read()).get('voices') or []
+    mine = get('https://api.elevenlabs.io/v2/voices?page_size=100&voice_type=personal')
+    try: premade = get('https://api.elevenlabs.io/v2/voices?page_size=100&voice_type=default')
+    except urllib.error.HTTPError: premade = []
+    if not premade: premade = [v for v in get('https://api.elevenlabs.io/v1/voices') if v.get('category') == 'premade']
+    return mine, premade
+
+
+def show_voices(mine, premade):
+    print('[내 목소리 — 내 채널만의 목소리(추천)]')
+    for v in mine: print(f"  {v['voice_id']}  [{v.get('category')}]  {v['name']}")
+    if not mine: print('  (없음) 전문 복제 안내: docs/06-내-목소리-전문-복제.md')
+    print('[기본 제공 목소리(premade) — 누구나 쓰는 목소리, 한국어도 eleven_multilingual_v2로 읽는다. 미리듣기는 ElevenLabs 웹 Voices에서 이름으로]')
+    for v in premade:
+        lb = v.get('labels') or {}; desc = ' · '.join(str(lb[k]) for k in ('gender', 'age', 'accent', 'use_case', 'descriptive') if lb.get(k))
+        print(f"  {v['voice_id']}  [{v.get('category') or 'premade'}]  {v['name']}" + (f'  ({desc})' if desc else ''))
+    if not premade: print('  (목록을 못 받음 — ElevenLabs 웹 Voices에서 확인)')
+
+
 def list_voices():
-    """내 계정 목소리와 voice_id. 전문 복제(docs/06)가 끝나면 [professional]로 나온다."""
+    """고를 수 있는 목소리와 voice_id. 전문 복제(docs/06)가 끝나면 내 목소리가 [professional]로 나온다."""
     key = os.environ.get('ELEVENLABS_API_KEY')
     if not key: sys.exit('ELEVENLABS_API_KEY가 없습니다. docs/03-음성-ElevenLabs.md를 보세요.')
-    req = urllib.request.Request('https://api.elevenlabs.io/v2/voices?page_size=100&voice_type=personal', headers={'xi-api-key': key})
-    with urllib.request.urlopen(req, timeout=60) as r: vs = json.loads(r.read())['voices']
-    if not vs: print('내 목소리가 없습니다 — 전문 복제 안내: docs/06-내-목소리-전문-복제.md'); return
-    for v in vs: print(f"{v['voice_id']}  [{v.get('category')}]  {v['name']}")
-    print('→ script.json settings.voice.voice_id에 넣는다(모든 새 영상에 쓰려면 templates/video/script.json에도).')
+    show_voices(*fetch_voices(key))
+    print(HOW_TO_SET)
+
+
+def no_voice(F):
+    """voice_id 없이 합성하려 할 때: 멈추고 고를 목록과 넣는 법을 보여 준다(사고: 처음 세팅을 건너뛰어 첫 영상이 데모 음성으로 나옴)."""
+    print(f'목소리(voice_id)가 비어 있어 멈췄어요: videos/{F.name}/script.json의 settings.voice.voice_id')
+    print('목소리 없이는 음성을 만들 수 없어요. 아래에서 하나를 골라 넣은 뒤 다시 실행하세요.\n')
+    key = os.environ.get('ELEVENLABS_API_KEY')
+    if key:
+        try: show_voices(*fetch_voices(key))
+        except Exception as e: print(f'(목록을 못 불러옴: {type(e).__name__}) → python tools/voice.py --voices')
+    else:
+        print('ELEVENLABS_API_KEY가 없어 목록을 못 불러와요 → docs/03-음성-ElevenLabs.md대로 키를 넣고 python tools/voice.py --voices')
+    print('\n' + HOW_TO_SET.replace('<slug>', F.name))
+    sys.exit(1)
 
 
 def main(argv):
@@ -111,6 +154,7 @@ def main(argv):
     F = Path(args[0]).resolve(); P = json.loads((F / 'script.json').read_text(encoding='utf-8'))
     settings, pron = P.get('settings') or {}, (P.get('settings') or {}).get('pron') or {}
     clips = args[1:] or list(dict.fromkeys(clip_of(s['id']) for s in P['scenes']))
+    if '--demo' not in flags and any(not spec(s, settings).get('voice_id') for s in P['scenes'] if clip_of(s['id']) in clips): no_voice(F)
     cache = F / 'cache' / ('voices-demo' if '--demo' in flags else 'voices'); cache.mkdir(parents=True, exist_ok=True)
     made = used = 0
     for c in clips:

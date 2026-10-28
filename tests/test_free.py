@@ -82,8 +82,11 @@ def test_big_number_needs_comparison():
 
 def test_shorts_mode_included(tmp_path):
     for f in ['tools/realkit/vertical.css', 'tools/realkit/captions.js', 'tools/realkit/scene3d.js', 'tools/realkit/vendor/three.min.js',
-              'templates/shorts/build_v1.py', 'templates/shorts/clips/v1/burj.js', '.claude/skills/shorts-explainer/SKILL.md']:
+              'templates/shorts/build_v1.py', 'templates/shorts/clips/v1/burj.js', '.claude/skills/shorts-explainer/SKILL.md',
+              'templates/shorts-blank/build_v1.py', 'templates/shorts-blank/clips/v1/a.html']:
         assert (KIT / f).exists(), f
+    skill = (KIT / '.claude' / 'skills' / 'shorts-explainer' / 'SKILL.md').read_text(encoding='utf-8')
+    assert 'gen_scene' not in skill and '실사 스타일 (전체 키트)' in skill and '로우폴리' in skill   # 무료판엔 AI 장면 생성이 없다고 정확히 안내
     out = subprocess.run([PY, str(KIT / 'tools' / 'check_script.py'), str(KIT / 'templates' / 'shorts')], capture_output=True, text=True, encoding='utf-8', env=ENV).stdout
     assert '통과' in out, out   # 예제 쇼츠 대본은 표기·체감 수치 규칙을 지킨다
     node = shutil.which('node')

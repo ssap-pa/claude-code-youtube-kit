@@ -8,6 +8,9 @@
    - <img data-seq="src/c0_bg" data-t0="ai">: JPEG 시퀀스(0000.jpg…) — t0 시각에 0번 프레임, 30fps로 넘김(앞뒤는 첫·끝 프레임 유지).
    - data-count="276" data-ct="rev" data-len="1" data-dec="2" data-pre="$" data-from="0": 숫자 세기(기본 ease-out).
      끝 시각을 신호로: data-ct-end="rev+0.7", 곡선: data-ease="out3|inout|lin".
+     천 단위 쉼표는 기본으로 넣는다(12,000). 끄기: data-sep="none" — 연도는 data-year 한 단어로 같은 효과
+       예) <span data-count="1178" data-from="1173" data-year data-ct="five"></span>  → 1173…1178 (1,178 아님)
+     다른 구분 기호: data-sep=" " (12 000).
    - window.onInit(RK) : 위치 계산(RK.box는 transform을 무시한 레이아웃 좌표), window.onSeek(t, RK): 프레임마다 직접 그릴 것(three.js 장면 등, async 가능).
    - window.RK_HOOKS = [fn(t, RK)] : 공용 부품이 프레임마다 그릴 것. RK.extra = 빌더가 Shot(extra=…)로 넘긴 자료(자막 등).
    시각 표기: 숫자(초) 또는 신호 이름±초("like", "ai+0.3", "fail-0.25"). 신호는 realkit.py가 대사 단어 시각으로 만든다. */
@@ -78,10 +81,13 @@
     });
     el.style.animation = parts.join(', ');
   }
-  function fmt(v, el) {
-    const dec = +(el.dataset.dec || 0);
-    return (el.dataset.pre || '') + v.toLocaleString('en-US', { minimumFractionDigits: dec, maximumFractionDigits: dec }) + (el.dataset.suf || '');
+  function fmt(v, el) {   // 천 단위 쉼표: data-sep="none"(또는 data-year)이면 끔 — 연도 1178이 '1,178'로 보이는 사고
+    const dec = +(el.dataset.dec || 0), sep = el.dataset.year != null ? 'none' : (el.dataset.sep ?? ',');
+    let s = v.toLocaleString('en-US', { minimumFractionDigits: dec, maximumFractionDigits: dec, useGrouping: sep !== 'none' && sep !== '' });
+    if (sep !== ',' && sep !== 'none' && sep !== '') s = s.replace(/,/g, sep);
+    return (el.dataset.pre || '') + s + (el.dataset.suf || '');
   }
+  RK.fmt = fmt;
 
   RK.ready = (async () => {
     if (document.readyState === 'loading') await new Promise(r => addEventListener('DOMContentLoaded', r));

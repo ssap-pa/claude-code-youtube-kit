@@ -19,7 +19,7 @@ AI한테 같은 피드백을 반복하고 있다면, AI가 멍청해서가 아�
 | 대본 스킬 | `.claude/skills/youtube-script/` | 학습한 규칙대로 대본을 장면 단위로 쓰고 → 표기 검사 → 내 목소리 음성까지 |
 | 화면 디자인 스킬 | `.claude/skills/real-ui-design/` | 원본 흐림 배경 + 실사 휴대폰·앱 화면 + 알림·카드의 세 층으로 장면을 만드는 법 |
 | 편집 도구 | `tools/realkit/`, `templates/video/` | 장면을 HTML로 짜서 30fps로 찍어요. **화면 움직임이 대사 단어 시각에 맞춰 자동으로 붙어요** |
-| 세로 설명 쇼츠 | `.claude/skills/shorts-explainer/`, `templates/shorts/`, `docs/07` | 3D 모형 장면 + 2~3단어 말 자막 + 큰 숫자 카드로 "왜?"를 설명하는 9:16 쇼츠. 「부르즈 할리파는 왜 계단처럼 깎였을까」 예제가 그대로 들어 있어요 |
+| 세로 설명 쇼츠 | `.claude/skills/shorts-explainer/`, `templates/shorts/`, `docs/07` | 3D 모형 장면 + 2~3단어 말 자막 + 큰 숫자 카드로 "왜?"를 설명하는 9:16 쇼츠. 새 쇼츠는 빈 틀(`new_video.py --shorts`)에서 시작하고, 「부르즈 할리파는 왜 계단처럼 깎였을까」 완성 예제(`--shorts --example`)도 그대로 들어 있어요. 스타일은 로우폴리 3D(무료). AI 실사 컷을 섞는 실사 스타일은 전체 키트 |
 | 합본·배경음 | `tools/make_final.py`, `tools/bgm.py` | 클립 이음새 입 밀림 방지, 대사 때 배경음 자동으로 줄이기, 곡을 끝까지 틀고 바꾸기 |
 | 업로드 전 검수 | `tools/qa.py`, `tools/regressions.json` | 대본=음성=클립=합본 판 확인, 장면 음성 위치(ms 단위), 받아쓰기↔대본, 배경음 겹침, 검은 화면, 음량, 전에 고친 사고 재발 |
 | 대본 검사 | `tools/check_script.py` | 소문자 'ai'를 '아이'로 읽는 것처럼 전에 고친 실수, 체감 비교 없는 큰 숫자를 음성 만들기 전에 막아요 |
