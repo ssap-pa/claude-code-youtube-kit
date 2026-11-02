@@ -28,6 +28,7 @@ import re
 import shutil
 import subprocess
 import sys
+import time
 import wave
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -478,12 +479,33 @@ class Shot:
     extra: dict = field(default_factory=dict)     # HTML에서 RK.extra로 읽는 자료(자막 묶음 등)
 
 
+def _ram_gb():
+    """이 PC에서 지금 남은 메모리(GB). 못 읽으면 넉넉하다고 본다."""
+    try:
+        if os.name == 'nt':
+            import ctypes
+            class M(ctypes.Structure):
+                _fields_ = [('len', ctypes.c_ulong), ('load', ctypes.c_ulong)] + [(n, ctypes.c_ulonglong) for n in ('total', 'avail', 'tpage', 'apage', 'tvirt', 'avirt', 'ext')]
+            m = M(); m.len = ctypes.sizeof(M); ctypes.windll.kernel32.GlobalMemoryStatusEx(ctypes.byref(m))
+            return m.avail / 2 ** 30
+        if sys.platform == 'darwin':   # macOS엔 SC_AVPHYS_PAGES가 없다 → 전체 메모리의 절반을 남은 양으로 본다
+            return os.sysconf('SC_PAGE_SIZE') * os.sysconf('SC_PHYS_PAGES') / 2 ** 31
+        return os.sysconf('SC_PAGE_SIZE') * os.sysconf('SC_AVPHYS_PAGES') / 2 ** 30
+    except Exception:
+        return 64
+
+
 def render_shots(V, shots, workdir, parallel=True):
-    """장면 묶음마다 별도 프로세스로 렌더(병렬). 반환 [(mp4, 경고)]."""
+    """장면 묶음마다 별도 프로세스로 렌더(병렬). 반환 [(mp4, 경고)].
+    동시에 도는 프로세스 수는 환경변수 RK_JOBS(기본: 남은 메모리 ÷ 1.8GB — 세로 1080x1920 한 장면이 브라우저+x264로 약 1.7GB).
+    사고: 8GB PC(남은 4GB)에서 장면 11개를 한꺼번에 띄워 브라우저·x264가 메모리 부족으로 죽음(2026-11-02 샌드박스 녹화)."""
     work = Path(workdir)
     work.mkdir(parents=True, exist_ok=True)
     procs = []
+    jobs = int(os.environ.get('RK_JOBS', 0)) or max(1, min(len(shots), int(_ram_gb() / 1.8)))
     for i, s in enumerate(shots):
+        while parallel and sum(1 for _, pr in procs if pr and pr.poll() is None) >= jobs:
+            time.sleep(.5)
         frames = sum(V[sid]['frames'] for sid in s.scenes)
         job = dict(html=str(Path(s.html).resolve()), out=str((work / f'shot{i}.mp4').resolve()), frames=frames, cues=s.cues,
                    seqs=seq_info(s.html, s.seqs), check_at=s.check_at, label=Path(s.html).stem, extra=s.extra)
@@ -498,6 +520,8 @@ def render_shots(V, shots, workdir, parallel=True):
     res = []
     for job, pr in procs:
         if pr and pr.wait():
+            for _, other in procs:   # 남은 장면 프로세스를 끈다(안 끄면 메모리를 쥔 채 계속 돈다)
+                if other and other.poll() is None: other.kill()
             raise RuntimeError(f'장면 렌더 실패 {job["html"]}')
         wf = Path(job['out'] + '.warn.json')
         res.append((Path(job['out']), json.loads(wf.read_text(encoding='utf-8')) if wf.exists() else []))

@@ -251,15 +251,19 @@ def check_av(V, lines):
     for old in Q.glob('sheet-*.jpg'): old.unlink()
     fonts = TOOLS / 'realkit' / 'fonts'   # drawtext 글꼴: 키트 글꼴을 그 폴더에서 이름만으로 넘긴다(윈도 경로의 ':' 이스케이프 문제 회피)
     font = next(iter(sorted(fonts.glob('*.ttf'))), None) if fonts.exists() else None
-    tile = "fps=1/3,scale=384:-2," + (f"drawtext=fontfile='{font.name}':" if font else "drawtext=") + "text='%{pts\\:hms}':x=6:y=6:fontsize=20:fontcolor=yellow:box=1:boxcolor=black@0.6,tile=10x5"
+    vd = dur(f); w, h = (int(x) for x in probe(f, '-select_streams', 'v:0', '-show_entries', 'stream=width,height').split(',')[:2])
+    # 세로 영상은 칸도 세로로(216×384), 줄 수는 영상 길이에 맞춘다 — 사고: 30초 세로 쇼츠가 10×5 시트에 한 줄만 차고 아래가 검은 빈칸(2026-11-02)
+    scale = 'scale=-2:384' if h > w else 'scale=384:-2'
+    grid = f'tile=10x{max(1, min(5, -(-(int(vd // 3) + 1) // 10)))}'
+    tile = f"fps=1/3,{scale}," + (f"drawtext=fontfile='{font.name}':" if font else "drawtext=") + "text='%{pts\\:hms}':x=6:y=6:fontsize=20:fontcolor=yellow:box=1:boxcolor=black@0.6," + grid
     jobs = [['ffmpeg', '-v', 'info', '-i', str(f), '-an', '-vf', 'scale=480:-2,blackdetect=d=0.3:pix_th=0.10,freezedetect=n=0.003:d=5', '-f', 'null', '-'],
             ['ffmpeg', '-v', 'info', '-i', str(f), '-vn', '-af', 'ebur128=peak=true', '-f', 'null', '-']]
     with ThreadPoolExecutor(2) as ex: scan, loud = ex.map(sh, jobs)
     sheet = subprocess.run(['ffmpeg', '-v', 'error', '-y', '-i', str(f), '-an', '-vf', tile, str((Q / 'sheet-%d.jpg').resolve())], capture_output=True, text=True,
                            encoding='utf-8', errors='replace', cwd=str(fonts) if font else None)
     if sheet.returncode:
-        sh(['ffmpeg', '-v', 'error', '-y', '-i', str(f), '-an', '-vf', 'fps=1/3,scale=384:-2,tile=10x5', str(Q / 'sheet-%d.jpg')]); lines.append('- (시트 시각 표시 실패 → 칸 번호×3초로 읽기)')
-    vd = dur(f); wh = probe(f, '-select_streams', 'v:0', '-show_entries', 'stream=width,height,r_frame_rate')
+        sh(['ffmpeg', '-v', 'error', '-y', '-i', str(f), '-an', '-vf', f'fps=1/3,{scale},{grid}', str(Q / 'sheet-%d.jpg')]); lines.append('- (시트 시각 표시 실패 → 칸 번호×3초로 읽기)')
+    wh = probe(f, '-select_streams', 'v:0', '-show_entries', 'stream=width,height,r_frame_rate')
     lines.append(f'- {wh}, {vd:.2f}초')
     for s, e in re.findall(r'black_start:([\d.]+) black_end:([\d.]+)', scan.stderr):
         edge = float(s) < .5 or float(e) > vd - 3; bad += not edge

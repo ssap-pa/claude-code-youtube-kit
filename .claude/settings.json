@@ -1,10 +1,10 @@
 {
   "hooks": {
     "SessionStart": [
-      { "hooks": [ { "type": "command", "command": "python \"$CLAUDE_PROJECT_DIR/hooks/session_start.py\"" } ] }
+      { "hooks": [ { "type": "command", "command": "python", "args": ["${CLAUDE_PROJECT_DIR}/hooks/session_start.py"], "timeout": 20 } ] }
     ],
     "UserPromptSubmit": [
-      { "hooks": [ { "type": "command", "command": "python \"$CLAUDE_PROJECT_DIR/hooks/capture_feedback.py\"" } ] }
+      { "hooks": [ { "type": "command", "command": "python", "args": ["${CLAUDE_PROJECT_DIR}/hooks/capture_feedback.py"], "timeout": 20 } ] }
     ]
   }
 }
